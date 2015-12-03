@@ -23,9 +23,9 @@
  ***************************************************************************************************/
 
 const char* Settings::ENGINE_NAME =         "Unnamed Engine";
-const char* Settings::ENGINE_VERSION =      "V0.1.2";
+const char* Settings::ENGINE_VERSION =      "V0.1.3";
 const char* Settings::ENGINE_VERSION_NAME = "New Language";
-const char* Settings::ENGINE_DATE =         "02/12/2015";
+const char* Settings::ENGINE_DATE =         "03/12/2015";
 const char* Settings::ENGINE_BUILD =        "Experimental";
 
 /***************************************************************************************************/

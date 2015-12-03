@@ -1,0 +1,41 @@
+--------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 3 (V0.1.3)
+
+--------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 2 (V0.1.2)
+
+* Added RenderTexture
+* Added FBO
+* Added GeometryBuffer
+
+* Cleaned up MeshRenderData a bit
+
+--------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 1 (V0.1.1)
+
+Hello. This is a whole new game engine which has even more
+changes than Andor 2. Firstly it is written in C++, which so
+far has proven much better for this purpose due to not having
+garbage collection which previously caused quite jagged frame
+rates. This was not the only reason for doing this, as after
+spending several years using Java, I thought it would a good
+change.
+
+This obviously means that there are many things that could be
+improved at the current time.
+
+Here are the list of current libraries being used:
+- GLFW
+- GLEW
+- Assimp
+- stb_image
+
+This means that many model and image formats are now
+supported, however since C++ does not have as much cross
+compatibility, for the time being, there will not be any
+other platforms supported other than Windows, but this
+doesn't matter much as this is mainly a set of experiments.
+
+As this is the first entry, there are not many changes here.
+
+* Models now use interleaved VBOs
