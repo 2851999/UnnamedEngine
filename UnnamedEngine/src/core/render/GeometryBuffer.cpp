@@ -32,6 +32,7 @@ GeometryBuffer::GeometryBuffer() {
 	m_fbo->add(new RenderTexture(width, height, GL_RGBA16F, GL_RGBA, GL_COLOR_ATTACHMENT0, GL_FLOAT, parameters));
 	m_fbo->add(new RenderTexture(width, height, GL_RGBA16F, GL_RGBA, GL_COLOR_ATTACHMENT1, GL_FLOAT, parameters));
 	m_fbo->add(new RenderTexture(width, height, GL_RGBA16F, GL_RGBA, GL_COLOR_ATTACHMENT2, GL_FLOAT, parameters));
+	m_fbo->add(new RenderTexture(width, height, GL_RGBA16F, GL_RGBA, GL_COLOR_ATTACHMENT3, GL_FLOAT, parameters));
 	m_fbo->add(new RenderTexture(width, height, GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT, GL_FLOAT, parameters));
 	m_fbo->setup();
 }

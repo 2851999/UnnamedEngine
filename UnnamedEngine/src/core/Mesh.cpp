@@ -104,8 +104,8 @@ void MeshRenderData::setup(MeshData* data, bool generateVBOs) {
 	if (data->hasTextureCoords() && data->separateTextureCoords()) {
 		//Setup the VBO
 		if (generateVBOs)
-			glGenBuffers(1, &m_colour_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, m_colour_vbo);
+			glGenBuffers(1, &m_textureCoord_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, m_textureCoord_vbo);
 		glBufferData(GL_ARRAY_BUFFER, data->getNumTextureCoords() * 2 * sizeof(data->getTextureCoords()[0]), &data->getTextureCoords().front(), m_textureCoordsUsage);
 
 		setupVertexAttribPointer("TextureCoordinate", shader, 2, 0, 0);
@@ -254,15 +254,9 @@ void MeshRenderData::updateTextureCoords(MeshData* data) {
 	glBindVertexArray(m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_textureCoord_vbo);
-	glBufferData(GL_ARRAY_BUFFER, data->getTextureCoords().size() * sizeof(data->getTextureCoords()[0]), &data->getTextureCoords().front(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, data->getNumTextureCoords() * 2 * sizeof(data->getTextureCoords()[0]), &data->getTextureCoords().front(), m_textureCoordsUsage);
 
-	GLint loc = Renderer::getShader(m_shaderType)->getAttributeLocation("TextureCoordinate");
-
-	if (loc >= 0) {
-		glEnableVertexAttribArray(loc);
-		glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	} else
-		logDebug(std::string("The shader type '") + m_shaderType + std::string("' does not support texture coordinates"));
+	setupVertexAttribPointer("TextureCoordinate", Renderer::getShader(m_shaderType), 2, 0, 0);
 
 	glBindVertexArray(0);
 }
@@ -367,10 +361,14 @@ void MeshBuilder::addQuadC(MeshData* data, Colour colours[], int n) {
 }
 
 void MeshBuilder::addQuadT(MeshData* data, Texture* texture) {
-	data->addTextureCoord(Vector2f(texture->left, texture->top));
-	data->addTextureCoord(Vector2f(texture->right, texture->top));
-	data->addTextureCoord(Vector2f(texture->right, texture->bottom));
-	data->addTextureCoord(Vector2f(texture->left, texture->bottom));
+//	data->addTextureCoord(Vector2f(texture->left, texture->top));
+//	data->addTextureCoord(Vector2f(texture->right, texture->top));
+//	data->addTextureCoord(Vector2f(texture->right, texture->bottom));
+//	data->addTextureCoord(Vector2f(texture->left, texture->bottom));
+	data->addTextureCoord(Vector2f(0, 1));
+	data->addTextureCoord(Vector2f(0, 0));
+	data->addTextureCoord(Vector2f(1, 0));
+	data->addTextureCoord(Vector2f(1, 1));
 }
 
 //Start of 3D stuff

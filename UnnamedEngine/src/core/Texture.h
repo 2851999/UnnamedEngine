@@ -149,7 +149,7 @@ public:
 		m_parameters = parameters;
 	}
 	Texture(int width, int height) {
-		m_texture = 0;
+		glGenTextures(1, &m_texture);
 		m_width = width;
 		m_height = height;
 		m_numComponents = 0;
@@ -160,7 +160,7 @@ public:
 	}
 
 	Texture(int width, int height, TextureParameters parameters) {
-		m_texture = 0;
+		glGenTextures(1, &m_texture);
 		m_width = width;
 		m_height = height;
 		m_numComponents = 0;

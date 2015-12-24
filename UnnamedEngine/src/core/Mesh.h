@@ -133,10 +133,10 @@ public:
 	inline bool separateTextureCoords() { return m_separateTextureCoords; }
 	inline bool separateNormals() { return m_separateNormals; }
 
-	inline void clearPositions() { m_positions.clear(); }
-	inline void clearColours() { m_colours.clear(); }
-	inline void clearTextureCoords() { m_textureCoords.clear(); }
-	inline void clearIndices() { m_indices.clear(); }
+	inline void clearPositions() { m_positions.clear(); m_numPositions = 0; }
+	inline void clearColours() { m_colours.clear(); m_numColours = 0; }
+	inline void clearTextureCoords() { m_textureCoords.clear(); m_numTextureCoordinates = 0; }
+	inline void clearIndices() { m_indices.clear(); m_numIndices = 0; }
 
 	inline bool hasPositions()     { return m_numPositions > 0; }
 	inline bool hasColours()       { return m_numColours > 0; }
@@ -235,6 +235,9 @@ public:
 	inline void updateColours() { m_renderData->updateColours(m_data); }
 	inline void updateTextureCoords() { m_renderData->updateTextureCoords(m_data); }
 	inline void updateIndices() { m_renderData->updateIndices(m_data); }
+
+	inline void setShaderType(std::string shaderType) { m_renderData->setShaderType(shaderType); }
+	inline std::string getShaderType() { return m_renderData->getShaderType(); }
 };
 
 /***************************************************************************************************/

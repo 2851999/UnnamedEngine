@@ -41,6 +41,12 @@ public:
 
 	static Model* loadModel(const char* path, const char* fileName, std::string shaderType);
 	static inline Model* loadModel(const char* path, const char* fileName) { return loadModel(path, fileName, "Material"); }
+
+	inline void setShaderType(std::string shaderType) {
+		for (unsigned int a = 0; a < m_meshes.size(); a++)
+			m_meshes.at(a)->setShaderType(shaderType);
+	}
+	inline std::string getShaderType() { return m_meshes.at(0)->getShaderType(); }
 };
 
 /***************************************************************************************************/

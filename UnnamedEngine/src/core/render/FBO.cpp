@@ -31,8 +31,9 @@ FBO::FBO(GLuint target) : m_target(target) {
 void FBO::setup() {
 	glBindFramebuffer(m_target, m_pointer);
 
-	for (unsigned int a = 0; a < m_textures.size(); a++)
+	for (unsigned int a = 0; a < m_textures.size(); a++) {
 		glFramebufferTexture2D(m_target, m_textures.at(a)->getAttachment(), m_textures.at(a)->getParameters().getTarget(), m_textures.at(a)->getTexture(), 0);
+	}
 
 	GLuint status = glCheckFramebufferStatus(m_target);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -49,7 +50,9 @@ void FBO::bind() {
 			buffers[a] = m_textures.at(a)->getAttachment();
 	}
 
-	glDrawBuffers(m_textures.size(), buffers);
+	for (unsigned int a = 0; a < m_textures.size(); a++)
+		std::cout << buffers[a] << std::endl;
+	glDrawBuffers(m_textures.size() - 1, buffers); //Should not stay like this, but GL_DEPTH_ATTACHMENT should not be bound, nor the last value here
 }
 
 void FBO::unbind() {

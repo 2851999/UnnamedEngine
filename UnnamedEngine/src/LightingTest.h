@@ -59,6 +59,9 @@ public:
 void LightingTest::initialise(Settings* settings) {
 	settings->setVideoSamples(16);
 	settings->setVideoMaxAnisotropicSamples(16);
+	settings->setVideoDeferredRendering(true);
+	settings->setDebggingShowInformation(true);
+	settings->setDebuggingShowDeferredRenderingBuffers(true);
 	wireframe = false;
 }
 
@@ -71,9 +74,9 @@ void LightingTest::created() {
 	TextureParameters::DEFAULT_FILTER = GL_LINEAR_MIPMAP_LINEAR;
 
 	SkyBox* skybox = new SkyBox("C:/UnnamedEngine/", "skybox0.png", "skybox1.png", "skybox2.png", "skybox3.png", "skybox4.png", "skybox5.png", 100);
+
 	camera->setSkyBox(skybox);
 	Renderer::addCamera(camera);
-
 //	model = Model::loadModel("C:/UnnamedEngine/Models/mitsuba/", "mitsuba-sphere-blue.obj");
 //	model->position.setY(-1);
 	model = Model::loadModel("C:/UnnamedEngine/Models/head/", "head.obj", "SpotLight");
@@ -84,6 +87,10 @@ void LightingTest::created() {
 
 	scene = new Scene();
 	scene->add(model);
+	scene->setLightingEnabled(false);
+
+	if (! scene->isLightingEnabled())
+		model->setShaderType("Material");
 
 	directionalLight = new DirectionalLight(new BaseLight(Colour::WHITE, 1.0f), Vector3f(0.0, 0.0, 1.0));
 
@@ -141,12 +148,16 @@ void LightingTest::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
-	camera->useView();
+	//camera->useView();
 
 	glEnable(GL_MULTISAMPLE_ARB);
 	glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+
+	if (wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 //	Renderer::setShader(Renderer::getShader("DirectionalLight"));
 //	Shader* shader = Renderer::getShader("");
@@ -159,12 +170,10 @@ void LightingTest::render() {
 //	scene->render();
 //
 //	Renderer::resetShader();
-
 	scene->render(camera->position);
 
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	renderInformation();
+	if (wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void LightingTest::destroy() {
@@ -182,10 +191,14 @@ void LightingTest::onKeyPressed(int key) {
 		requestClose();
 	else if (key == GLFW_KEY_M) {
 		wireframe = ! wireframe;
-		if (wireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	} else if (key == GLFW_KEY_F5) {
+		getSettings()->setVideoDeferredRendering(! getSettings()->getVideoDeferredRendering());
+	} else if (key == GLFW_KEY_F6) {
+		scene->setLightingEnabled(! scene->isLightingEnabled());
+		if (! scene->isLightingEnabled())
+			model->setShaderType("Material");
 		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			model->setShaderType("SpotLight");
 	} else if (key == GLFW_KEY_F3)
 		Mouse::toggleLock();
 }

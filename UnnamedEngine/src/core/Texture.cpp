@@ -74,7 +74,6 @@ Texture* Texture::loadTexture(const char* path, TextureParameters parameters, bo
 		colourMode = GL_RGB;
 	else if (numC == 4)
 		colourMode = GL_RGBA;
-
 	Texture* texture = new Texture(parameters);
 	texture->setWidth(w);
 	texture->setHeight(h);

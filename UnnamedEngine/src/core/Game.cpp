@@ -64,7 +64,31 @@ void Game::create() {
 			m_fpsCalculator->update();
 			//Update and render the game
 			update();
-			render();
+
+			if (m_settings->getVideoDeferredRendering()) {
+				Renderer::setShader(Renderer::getShader("DeferredShader"));
+				DeferredRenderer::start();
+				render();
+				DeferredRenderer::stop();
+				Renderer::resetShader();
+
+				//Should move this
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				glEnable(GL_TEXTURE_2D);
+				glDisable(GL_DEPTH_TEST);
+				DeferredRenderer::renderToScreen();
+			} else
+				render();
+
+			//Render the information if needed
+			if (m_settings->getDebuggingShowInformation()) {
+				//Ensure it can render properly
+				glDisable(GL_CULL_FACE);
+				glDisable(GL_DEPTH_TEST);
+
+				//Render the information
+				renderInformation();
+			}
 			//Update the window
 			m_window->update();
 		}
@@ -88,5 +112,6 @@ void Game::renderInformation() {
 	m_font->render("VSync:               " + to_string(m_settings->getVideoVSync()), 0, 122);
 	m_font->render("MSAA Samples:        " + to_string(m_settings->getVideoSamples()), 0, 136);
 	m_font->render("Max Anisotropic Samples: " + to_string(m_settings->getVideoMaxAnisotropicSamples()), 0, 150);
+	m_font->render("Deferred Rendering:  " + to_string(m_settings->getVideoDeferredRendering()), 0, 164);
 	Renderer::removeCamera();
 }

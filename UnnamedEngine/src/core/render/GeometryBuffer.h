@@ -33,7 +33,8 @@ public:
 	static const int BUFFER_POSITION = 0;
 	static const int BUFFER_COLOUR   = 1;
 	static const int BUFFER_NORMAL   = 2;
-	static const int BUFFER_DEPTH    = 3;
+	static const int BUFFER_WORLD_POSITION = 3;
+	static const int BUFFER_DEPTH    = 4;
 
 	GeometryBuffer();
 

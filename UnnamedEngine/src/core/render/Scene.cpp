@@ -18,6 +18,7 @@
 
 #include "Scene.h"
 #include "Renderer.h"
+#include "../Game.h"
 
 /***************************************************************************************************
  * The Scene class
@@ -29,7 +30,7 @@ void Scene::update() {
 }
 
 void Scene::render(Vector3f cameraPosition) {
-	if (m_lightingEnabled) {
+	if (m_lightingEnabled && ! Game::current->getSettings()->getVideoDeferredRendering()) {
 		Renderer::setShader(Renderer::getShader("AmbientLight"));
 		Shader* shader = Renderer::getShader("");
 		shader->use();
@@ -72,6 +73,22 @@ void Scene::render(Vector3f cameraPosition) {
 			glDisable(GL_BLEND);
 
 		}
+	} else if (Game::current->getSettings()->getVideoDeferredRendering()) {
+		Shader* shader = Renderer::getShader("");
+		shader->use();
+
+		for (unsigned int a = 0; a < m_objects.size(); a++) {
+			Matrix4f normalMatrix = m_objects.at(a)->getModelMatrix().inverse().transpose();
+
+			shader->setUniform("NormalMatrix", normalMatrix);
+
+			m_objects.at(a)->render();
+		}
+
+		Renderer::resetShader();
+	} else {
+		for (unsigned int a = 0; a < m_objects.size(); a++)
+			m_objects.at(a)->render();
 	}
 }
 

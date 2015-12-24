@@ -63,10 +63,15 @@ private:
 	int         m_video_refresh_rate;
 	int         m_video_max_anisotropic_samples;
 	Vector2i    m_video_resolution;
+	bool		m_video_deferred_rendering;
 
 	/* The values that correspond to specific 'input' settings */
 	bool        m_input_mouse_events_repeat;
 	bool        m_input_keyboard_events_repeat;
+
+	/* The values that correspond to specific 'debugging' settings */
+	bool		m_debugging_show_information;
+	bool		m_debugging_show_deferred_rendering_buffers;
 public:
 	static const char* ENGINE_NAME;
 	static const char* ENGINE_VERSION;
@@ -93,9 +98,13 @@ public:
 		m_video_refresh_rate = 60;
 		m_video_max_anisotropic_samples = 0;
 		m_video_resolution   = VIDEO_RESOLUTION_DEFAULT;
+		m_video_deferred_rendering = false;
 
 		m_input_mouse_events_repeat = false;
 		m_input_keyboard_events_repeat = true;
+
+		m_debugging_show_information = true;
+		m_debugging_show_deferred_rendering_buffers = true;
 	}
 
 	/* Define all of the methods used to assign and get values stored
@@ -116,9 +125,13 @@ public:
 	inline void setVideoRefreshRate(int refreshRate) { m_video_refresh_rate = refreshRate; }
 	inline void setVideoMaxAnisotropicSamples(int maxAnisotropicSamples) { m_video_max_anisotropic_samples = maxAnisotropicSamples; }
 	inline void setVideoResolution(Vector2i videoResolution)             { m_video_resolution              = videoResolution;       }
+	inline void setVideoDeferredRendering(bool videoDeferredRendering)   { m_video_deferred_rendering      = videoDeferredRendering; }
 
 	inline void setMouseEventsRepeat(bool mouseEventsRepeat)             { m_input_mouse_events_repeat = mouseEventsRepeat; }
 	inline void setKeyboardEventsRepeat(bool keyboardEventsRepeat)             { m_input_keyboard_events_repeat = keyboardEventsRepeat; }
+
+	inline void setDebggingShowInformation(bool debuggingShowInformation) { m_debugging_show_information = debuggingShowInformation; }
+	inline void setDebuggingShowDeferredRenderingBuffers(bool debuggingShowDeferredRenderingBuffers) { m_debugging_show_deferred_rendering_buffers = debuggingShowDeferredRenderingBuffers; }
 
 	inline const char* getWindowTitle()                    { return m_window_title;            }
 	inline int         getWindowWidth()                    { return m_window_width;            }
@@ -134,9 +147,13 @@ public:
 	inline int         getVideoRefreshRate()               { return m_video_refresh_rate;      }
 	inline int         getVideoMaxAnisotropicSamples()     { return m_video_max_anisotropic_samples; }
 	inline Vector2i    getVideoResolution()                { return m_video_resolution;        }
+	inline bool		   getVideoDeferredRendering()         { return m_video_deferred_rendering; }
 
 	inline bool        getMouseEventsRepeat()              { return m_input_mouse_events_repeat; }
 	inline bool        getKeyboardEventsRepeat()              { return m_input_keyboard_events_repeat; }
+
+	inline bool		   getDebuggingShowInformation()       { return m_debugging_show_information; }
+	inline bool		   getDebuggingShowDeferredRenderingBuffers() { return m_debugging_show_deferred_rendering_buffers; }
 };
 
 /***************************************************************************************************/

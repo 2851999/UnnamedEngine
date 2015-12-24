@@ -23,6 +23,7 @@
 #include "../Camera.h"
 #include "Shader.h"
 #include "Material.h"
+#include "GeometryBuffer.h"
 
 /***************************************************************************************************
  * The Renderer class is responsible for rendering
@@ -38,7 +39,6 @@ private:
 	static Shader* m_overrideShader;
 public:
 	static Texture* TEXTURE_BLANK;
-	virtual ~Renderer() {}
 	static inline void addCamera(Camera* camera) { m_cameras.push_back(camera); }
 	static inline void addShader(std::string type, RenderShader* shader) { m_shaders.insert(std::pair<std::string, RenderShader*>(type, shader)); }
 	static inline void removeCamera() { m_cameras.pop_back(); }
@@ -59,6 +59,36 @@ public:
 	static inline void render(Mesh* mesh, Matrix4f modelMatrix) { render(mesh, modelMatrix, mesh->getRenderData()->getShaderType()); }
 	static GLuint bindTexture(Texture* texture);
 	static void unbindTetxures();
+};
+
+/***************************************************************************************************/
+
+/***************************************************************************************************
+ * The DeferredRenderer class is responsible for deferred rendering
+ ***************************************************************************************************/
+
+class DeferredRenderer {
+private:
+	/* The GBuffer */
+	static GeometryBuffer* m_geometryBuffer;
+
+	/* The screen quad for rendering the output */
+	static RenderableObject2D* m_screenQuad;
+
+	/* For debugging */
+	static Camera2D* m_camera;
+	static RenderableObject2D* m_positionQuad;
+	static RenderableObject2D* m_normalQuad;
+	static RenderableObject2D* m_colourQuad;
+	static RenderableObject2D* m_depthQuad;
+	static RenderableObject2D* m_worldPositionQuad;
+public:
+	static void initialise();
+
+	static inline void start() { m_geometryBuffer->bind(); }
+	static inline void stop()  { m_geometryBuffer->unbind(); }
+
+	static void renderToScreen();
 };
 
 /***************************************************************************************************/

@@ -18,6 +18,7 @@
 
 #include "../../utils/FileUtils.h"
 #include "../ResourceLoader.h"
+#include "../Game.h"
 #include "lighting/Light.h"
 
 #include "Renderer.h"
@@ -66,6 +67,9 @@ void Renderer::initialise() {
 	addShader("PointLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "PointLight", "PointLight"));
 	addShader("SpotLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "SpotLight", "SpotLight"));
 	addShader("AmbientLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "AmbientLight", "AmbientLight"));
+	addShader("DeferredShader", ResourceLoader::loadRenderShader("resources/shaders/deferred/", "DeferredShader", "DeferredShader"));
+
+	DeferredRenderer::initialise();
 }
 
 void Renderer::setupShader(Shader* shader, const char* type) {
@@ -107,6 +111,15 @@ void Renderer::setupShader(Shader* shader, const char* type) {
 		} else if (std::string(type) == "SpotLight") {
 			SpotLight::addUniforms(shader, "", "spotLight.");
 		}
+	} else if (std::string(type) == "DeferredShader") {
+		shader->addUniform("NormalMatrix", "nMatrix");
+		shader->addUniform("ModelViewProjectionMatrix", "mvpMatrix");
+
+		Material::addUniforms(shader);
+
+		shader->addAttribute("Position", "position");
+		shader->addAttribute("TextureCoordinate", "textureCoord");
+		shader->addAttribute("Normal", "normal");
 	} else {
 		logError("Unknown shader type '" + to_string(type) + "'");
 	}
@@ -125,6 +138,125 @@ void Renderer::unbindTetxures() {
 		glActiveTexture(GL_TEXTURE0 + m_boundTextures.size());
 		m_boundTextures.at(m_boundTextures.size() - 1)->unbind();
 		m_boundTextures.pop_back();
+	}
+}
+
+/***************************************************************************************************/
+
+/***************************************************************************************************
+ * The DeferredRenderer class
+ ***************************************************************************************************/
+
+/* The GBuffer */
+GeometryBuffer* DeferredRenderer::m_geometryBuffer;
+
+/* The screen quad for rendering the output */
+RenderableObject2D* DeferredRenderer::m_screenQuad;
+
+/* For debugging */
+Camera2D* DeferredRenderer::m_camera;
+RenderableObject2D* DeferredRenderer::m_positionQuad;
+RenderableObject2D* DeferredRenderer::m_normalQuad;
+RenderableObject2D* DeferredRenderer::m_colourQuad;
+RenderableObject2D* DeferredRenderer::m_depthQuad;
+RenderableObject2D* DeferredRenderer::m_worldPositionQuad;
+
+void DeferredRenderer::initialise() {
+	m_geometryBuffer = new GeometryBuffer();
+
+	int width = Game::current->getSettings()->getWindowWidth();
+	int height = Game::current->getSettings()->getWindowHeight();
+
+	m_camera = new Camera2D(Matrix4f().initOrthographic(0, width, height, 0, -1, 1));
+	m_camera->update();
+
+	m_screenQuad = new RenderableObject2D(MeshBuilder::createQuad(width, height, new Texture(), Colour::WHITE));
+	m_screenQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_COLOUR));
+	m_screenQuad->setSize(width, height);
+	m_screenQuad->getMesh()->getData()->clearTextureCoords();
+	m_screenQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_screenQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_screenQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_screenQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_screenQuad->getMesh()->updateTextureCoords();
+	m_screenQuad->update();
+
+	m_positionQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
+	m_positionQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_POSITION));
+	m_positionQuad->setSize(width, height);
+	m_positionQuad->getMesh()->getData()->clearTextureCoords();
+	m_positionQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_positionQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_positionQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_positionQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_positionQuad->getMesh()->updateTextureCoords();
+	m_positionQuad->setPosition(width - (width / 5), 0);
+	m_positionQuad->update();
+
+	m_normalQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
+	m_normalQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_NORMAL));
+	m_normalQuad->setSize(width, height);
+	m_normalQuad->getMesh()->getData()->clearTextureCoords();
+	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_normalQuad->getMesh()->updateTextureCoords();
+	m_normalQuad->setPosition(width - (width / 5), (height / 5));
+	m_normalQuad->update();
+
+	m_colourQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
+	m_colourQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_COLOUR));
+	m_colourQuad->setSize(width, height);
+	m_colourQuad->getMesh()->getData()->clearTextureCoords();
+	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_colourQuad->getMesh()->updateTextureCoords();
+	m_colourQuad->setPosition(width - (width / 5), (height / 5) * 2);
+	m_colourQuad->update();
+
+	m_worldPositionQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
+	m_worldPositionQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_WORLD_POSITION));
+	m_worldPositionQuad->setSize(width, height);
+	m_worldPositionQuad->getMesh()->getData()->clearTextureCoords();
+	m_worldPositionQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_worldPositionQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_worldPositionQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_worldPositionQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_worldPositionQuad->getMesh()->updateTextureCoords();
+	m_worldPositionQuad->setPosition(width - (width / 5), (height / 5) * 3);
+	m_worldPositionQuad->update();
+
+	m_depthQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
+	m_depthQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_DEPTH));
+	m_depthQuad->setSize(width, height);
+	m_depthQuad->getMesh()->getData()->clearTextureCoords();
+	m_depthQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_depthQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_depthQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_depthQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_depthQuad->getMesh()->updateTextureCoords();
+	m_depthQuad->setPosition(width - (width / 5), (height / 5) * 4);
+	m_depthQuad->update();
+}
+
+void DeferredRenderer::renderToScreen() {
+	if (m_screenQuad != NULL) {
+		Renderer::addCamera(m_camera);
+
+		m_screenQuad->render();
+
+		if (Game::current->getSettings()->getDebuggingShowDeferredRenderingBuffers()) {
+			m_positionQuad->render();
+			m_normalQuad->render();
+			m_colourQuad->render();
+			m_worldPositionQuad->render();
+			m_depthQuad->render();
+		}
+
+		Renderer::removeCamera();
 	}
 }
 
