@@ -21,6 +21,7 @@
 
 #include "../Mesh.h"
 #include "../Camera.h"
+#include "../Game.h"
 #include "Shader.h"
 #include "Material.h"
 #include "GeometryBuffer.h"
@@ -37,6 +38,7 @@ private:
 	static std::vector<Texture*> m_boundTextures;
 
 	static Shader* m_overrideShader;
+	static bool m_deferredRendering;
 public:
 	static Texture* TEXTURE_BLANK;
 	static inline void addCamera(Camera* camera) { m_cameras.push_back(camera); }
@@ -48,9 +50,17 @@ public:
 	static inline Camera* getCamera() { return m_cameras.back(); }
 	static inline RenderShader* getRenderShader(std::string type) { return m_shaders.at(type); }
 	static inline Shader* getShader(std::string type) {
-		if (m_overrideShader == NULL)
-			return m_shaders.at(type)->getShader();
-		else
+		if (m_overrideShader == NULL) {
+			if (m_shaders.count(type) != 0) {
+				return m_shaders.at(type)->getShader();
+			} else {
+				if (m_deferredRendering)
+					type = "Deferred" + type;
+				else
+					type = "Forward" + type;
+				return m_shaders.at(type)->getShader();
+			}
+		} else
 			return m_overrideShader;
 	}
 	static void initialise();
@@ -59,6 +69,9 @@ public:
 	static inline void render(Mesh* mesh, Matrix4f modelMatrix) { render(mesh, modelMatrix, mesh->getRenderData()->getShaderType()); }
 	static GLuint bindTexture(Texture* texture);
 	static void unbindTetxures();
+	static inline unsigned int getNumBoundTextures() { return m_boundTextures.size(); }
+	static void enableDeferredRendering() { m_deferredRendering = true; }
+	static void disableDeferredRendering() { m_deferredRendering = false; }
 };
 
 /***************************************************************************************************/
@@ -77,18 +90,19 @@ private:
 
 	/* For debugging */
 	static Camera2D* m_camera;
-	static RenderableObject2D* m_positionQuad;
-	static RenderableObject2D* m_normalQuad;
-	static RenderableObject2D* m_colourQuad;
-	static RenderableObject2D* m_depthQuad;
 	static RenderableObject2D* m_worldPositionQuad;
+	static RenderableObject2D* m_colourQuad;
+	static RenderableObject2D* m_normalQuad;
+	static RenderableObject2D* m_shininessQuad;
+	static RenderableObject2D* m_depthQuad;
 public:
 	static void initialise();
 
 	static inline void start() { m_geometryBuffer->bind(); }
 	static inline void stop()  { m_geometryBuffer->unbind(); }
 
-	static void renderToScreen();
+	static void renderToScreen(bool bindBuffers = true, bool unbindBuffers = true);
+	static void renderBuffers();
 };
 
 /***************************************************************************************************/

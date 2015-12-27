@@ -51,7 +51,7 @@ void Scene::render(Vector3f cameraPosition) {
 			for (unsigned int a = 0; a < m_lights.size(); a++) {
 				m_lights.at(a)->apply();
 
-				Shader* shader = Renderer::getShader("");
+				shader = Renderer::getShader("");
 
 				for (unsigned int b = 0; b < m_objects.size(); b++) {
 
@@ -74,6 +74,7 @@ void Scene::render(Vector3f cameraPosition) {
 
 		}
 	} else if (Game::current->getSettings()->getVideoDeferredRendering()) {
+		Renderer::enableDeferredRendering();
 		Shader* shader = Renderer::getShader("");
 		shader->use();
 
@@ -86,9 +87,55 @@ void Scene::render(Vector3f cameraPosition) {
 		}
 
 		Renderer::resetShader();
+		Renderer::disableDeferredRendering();
 	} else {
 		for (unsigned int a = 0; a < m_objects.size(); a++)
 			m_objects.at(a)->render();
+	}
+}
+
+void Scene::renderFinal(Vector3f cameraPosition) {
+	if (m_lightingEnabled && Game::current->getSettings()->getVideoDeferredRendering()) {
+		Renderer::enableDeferredRendering();
+		Renderer::setShader(Renderer::getShader("AmbientLight"));
+		Shader* shader = Renderer::getShader("");
+		shader->use();
+		shader->setUniform("AmbientLight", m_ambientLight);
+		DeferredRenderer::renderToScreen(true, false);
+
+		Renderer::resetShader();
+
+		if (m_lights.size() > 0) {
+
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
+			glDepthMask(false);
+			glDepthFunc(GL_EQUAL);
+
+			for (unsigned int a = 0; a < m_lights.size(); a++) {
+				m_lights.at(a)->apply();
+
+				shader = Renderer::getShader("");
+
+				shader->setUniform("SpecularIntensity", m_specularIntensity);
+				shader->setUniform("EyePosition", cameraPosition);
+
+				DeferredRenderer::renderToScreen(false, false);
+
+				Renderer::resetShader();
+			}
+
+			glDepthFunc(GL_LESS);
+			glDepthMask(true);
+			glDisable(GL_BLEND);
+
+		}
+		Renderer::unbindTetxures();
+		Renderer::disableDeferredRendering();
+	} else if (Game::current->getSettings()->getVideoDeferredRendering()) {
+		Renderer::enableDeferredRendering();
+		DeferredRenderer::renderToScreen();
+		Renderer::disableDeferredRendering();
 	}
 }
 

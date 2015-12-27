@@ -55,7 +55,7 @@ void Game::create() {
 		m_camera = new Camera2D(Matrix4f().initOrthographic(0, m_settings->getWindowWidth(), m_settings->getWindowHeight(), 0, -1, 1));
 		m_camera->update();
 
-		//Notify the game that the engine has been initalised
+		//Notify the game that the engine has been initialised
 		created();
 
 		//The main game loop
@@ -64,21 +64,7 @@ void Game::create() {
 			m_fpsCalculator->update();
 			//Update and render the game
 			update();
-
-			if (m_settings->getVideoDeferredRendering()) {
-				Renderer::setShader(Renderer::getShader("DeferredShader"));
-				DeferredRenderer::start();
-				render();
-				DeferredRenderer::stop();
-				Renderer::resetShader();
-
-				//Should move this
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				glEnable(GL_TEXTURE_2D);
-				glDisable(GL_DEPTH_TEST);
-				DeferredRenderer::renderToScreen();
-			} else
-				render();
+			render();
 
 			//Render the information if needed
 			if (m_settings->getDebuggingShowInformation()) {
@@ -100,6 +86,8 @@ void Game::create() {
 
 /* This method simply renders some information */
 void Game::renderInformation() {
+	if (m_settings->getVideoDeferredRendering() && m_settings->getDebuggingShowDeferredRenderingBuffers())
+		DeferredRenderer::renderBuffers();
 	Renderer::addCamera(m_camera);
 	m_font->render("DEBUGGING", 0, 0);
 	m_font->render("Engine Version:      " + to_string(Settings::ENGINE_VERSION), 0, 24);

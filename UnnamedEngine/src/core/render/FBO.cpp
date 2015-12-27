@@ -26,13 +26,33 @@
 
 FBO::FBO(GLuint target) : m_target(target) {
 	glGenFramebuffers(1, &m_pointer);
+	m_attachments = NULL;
+	m_numAttachments = 0;
 }
 
 void FBO::setup() {
 	glBindFramebuffer(m_target, m_pointer);
 
+	//Check the textures and make sure any depth attachments are discounted
+	for (unsigned int a = 0; a < m_textures.size(); a++) {
+		if (m_textures.at(a)->getAttachment() != GL_DEPTH_ATTACHMENT)
+			m_numAttachments++;
+	}
+
+	//Setup the array of attachments
+	m_attachments = new GLuint[m_numAttachments];
+
+	//The current attachment
+	unsigned int currentAttachment = 0;
+
 	for (unsigned int a = 0; a < m_textures.size(); a++) {
 		glFramebufferTexture2D(m_target, m_textures.at(a)->getAttachment(), m_textures.at(a)->getParameters().getTarget(), m_textures.at(a)->getTexture(), 0);
+
+		//Assign the next attachment
+		if (m_textures.at(a)->getAttachment() != GL_DEPTH_ATTACHMENT) {
+			m_attachments[currentAttachment] = m_textures.at(a)->getAttachment();
+			currentAttachment++;
+		}
 	}
 
 	GLuint status = glCheckFramebufferStatus(m_target);
@@ -43,16 +63,8 @@ void FBO::setup() {
 
 void FBO::bind() {
 	glBindFramebuffer(m_target, m_pointer);
-	/* Should do this in setup */
-	GLenum buffers[m_textures.size()];
-	for (unsigned int a = 0; a < m_textures.size(); a++) {
-		if (m_textures.at(a)->getAttachment() != GL_DEPTH_ATTACHMENT)
-			buffers[a] = m_textures.at(a)->getAttachment();
-	}
 
-	for (unsigned int a = 0; a < m_textures.size(); a++)
-		std::cout << buffers[a] << std::endl;
-	glDrawBuffers(m_textures.size() - 1, buffers); //Should not stay like this, but GL_DEPTH_ATTACHMENT should not be bound, nor the last value here
+	glDrawBuffers(m_numAttachments, m_attachments);
 }
 
 void FBO::unbind() {

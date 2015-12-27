@@ -35,6 +35,8 @@ std::vector<Texture*> Renderer::m_boundTextures;
 
 Shader* Renderer::m_overrideShader;
 
+bool Renderer::m_deferredRendering;
+
 void Renderer::render(Mesh* mesh, Matrix4f modelMatrix, std::string shaderType) {
 	Shader* currentShader = getShader(shaderType);
 	if (currentShader != NULL) {
@@ -59,25 +61,45 @@ void Renderer::initialise() {
 	//Initialise the textures
 	TEXTURE_BLANK = Texture::loadTexture("resources/textures/blank.png");
 
+	m_deferredRendering = false;
+
 	//Add the shaders
-	addShader("Basic", ResourceLoader::loadRenderShader("resources/shaders/", "BasicShader", "Basic"));
+	addShader("ForwardBasic", ResourceLoader::loadRenderShader("resources/shaders/", "ForwardBasicShader", "ForwardBasic"));
+	addShader("DeferredBasic", ResourceLoader::loadRenderShader("resources/shaders/", "DeferredBasicShader", "DeferredBasic"));
 	addShader("SkyBox", ResourceLoader::loadRenderShader("resources/shaders/", "SkyBoxShader", "SkyBox"));
 	addShader("Material", ResourceLoader::loadRenderShader("resources/shaders/", "MaterialShader", "Material"));
-	addShader("DirectionalLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "DirectionalLight", "DirectionalLight"));
-	addShader("PointLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "PointLight", "PointLight"));
-	addShader("SpotLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "SpotLight", "SpotLight"));
-	addShader("AmbientLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "AmbientLight", "AmbientLight"));
+
+	addShader("ForwardAmbientLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "ForwardAmbientLight", "ForwardAmbientLight"));
+	addShader("ForwardDirectionalLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "ForwardDirectionalLight", "ForwardDirectionalLight"));
+	addShader("ForwardPointLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "ForwardPointLight", "ForwardPointLight"));
+	addShader("ForwardSpotLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "ForwardSpotLight", "ForwardSpotLight"));
+
+	addShader("DeferredAmbientLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "DeferredAmbientLight", "DeferredAmbientLight"));
+	addShader("DeferredDirectionalLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "DeferredDirectionalLight", "DeferredDirectionalLight"));
+	addShader("DeferredPointLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "DeferredPointLight", "DeferredPointLight"));
+	addShader("DeferredSpotLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "DeferredSpotLight", "DeferredSpotLight"));
+
 	addShader("DeferredShader", ResourceLoader::loadRenderShader("resources/shaders/deferred/", "DeferredShader", "DeferredShader"));
 
 	DeferredRenderer::initialise();
 }
 
 void Renderer::setupShader(Shader* shader, const char* type) {
-	if (std::string(type) == "Basic") {
+	if (std::string(type) == "ForwardBasic") {
 		shader->addUniform("ModelViewProjectionMatrix", "mvpMatrix");
 		shader->addUniform("Texture", "tex");
 		shader->addAttribute("Position", "position");
 		shader->addAttribute("Colour", "colour");
+		shader->addAttribute("TextureCoordinate", "textureCoord");
+	} else if (std::string(type) == "DeferredBasic") {
+		shader->addUniform("ModelViewProjectionMatrix", "mvpMatrix");
+
+		shader->addUniform("WorldPositionBuffer", "buffer_worldPosition");
+		shader->addUniform("ColourBuffer", "buffer_colour");
+		shader->addUniform("NormalBuffer", "buffer_normal");
+		shader->addUniform("ShininessBuffer", "buffer_shininess");
+
+		shader->addAttribute("Position", "position");
 		shader->addAttribute("TextureCoordinate", "textureCoord");
 	} else if (std::string(type) == "Material") {
 		shader->addUniform("ModelViewProjectionMatrix", "mvpMatrix");
@@ -91,24 +113,35 @@ void Renderer::setupShader(Shader* shader, const char* type) {
 		shader->addUniform("Texture", "tex");
 		shader->addAttribute("Position", "position");
 	} else if (std::string(type).find("Light") != std::string::npos) {
-		shader->addUniform("NormalMatrix", "nMatrix");
 		shader->addUniform("ModelViewProjectionMatrix", "mvpMatrix");
 
 		shader->addUniform("AmbientLight", "ambientLight");
 		shader->addUniform("SpecularIntensity", "specularIntensity");
 		shader->addUniform("EyePosition", "eyePosition");
 
-		Material::addUniforms(shader);
+		if (std::string(type).find("Forward") != std::string::npos) {
+			shader->addUniform("NormalMatrix", "nMatrix");
 
-		shader->addAttribute("Position", "position");
+			shader->addAttribute("Position", "position");
+			shader->addAttribute("Normal", "normal");
+
+			Material::addUniforms(shader);
+		} else if (std::string(type).find("Deferred") != std::string::npos) {
+			shader->addAttribute("Position", "position");
+
+			shader->addUniform("WorldPositionBuffer", "buffer_worldPosition");
+			shader->addUniform("ColourBuffer", "buffer_colour");
+			shader->addUniform("NormalBuffer", "buffer_normal");
+			shader->addUniform("ShininessBuffer", "buffer_shininess");
+		}
+
 		shader->addAttribute("TextureCoordinate", "textureCoord");
-		shader->addAttribute("Normal", "normal");
 
-		if (std::string(type) == "DirectionalLight") {
+		if (std::string(type).find("DirectionalLight") != std::string::npos) {
 			DirectionalLight::addUniforms(shader, "", "directionalLight.");
-		} else if (std::string(type) == "PointLight") {
+		} else if (std::string(type).find("PointLight") != std::string::npos) {
 			PointLight::addUniforms(shader, "", "pointLight.");
-		} else if (std::string(type) == "SpotLight") {
+		} else if (std::string(type).find("SpotLight") != std::string::npos) {
 			SpotLight::addUniforms(shader, "", "spotLight.");
 		}
 	} else if (std::string(type) == "DeferredShader") {
@@ -155,11 +188,11 @@ RenderableObject2D* DeferredRenderer::m_screenQuad;
 
 /* For debugging */
 Camera2D* DeferredRenderer::m_camera;
-RenderableObject2D* DeferredRenderer::m_positionQuad;
+RenderableObject2D* DeferredRenderer::m_worldPositionQuad;
 RenderableObject2D* DeferredRenderer::m_normalQuad;
 RenderableObject2D* DeferredRenderer::m_colourQuad;
+RenderableObject2D* DeferredRenderer::m_shininessQuad;
 RenderableObject2D* DeferredRenderer::m_depthQuad;
-RenderableObject2D* DeferredRenderer::m_worldPositionQuad;
 
 void DeferredRenderer::initialise() {
 	m_geometryBuffer = new GeometryBuffer();
@@ -170,6 +203,7 @@ void DeferredRenderer::initialise() {
 	m_camera = new Camera2D(Matrix4f().initOrthographic(0, width, height, 0, -1, 1));
 	m_camera->update();
 
+	Renderer::enableDeferredRendering();
 	m_screenQuad = new RenderableObject2D(MeshBuilder::createQuad(width, height, new Texture(), Colour::WHITE));
 	m_screenQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_COLOUR));
 	m_screenQuad->setSize(width, height);
@@ -180,42 +214,7 @@ void DeferredRenderer::initialise() {
 	m_screenQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
 	m_screenQuad->getMesh()->updateTextureCoords();
 	m_screenQuad->update();
-
-	m_positionQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
-	m_positionQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_POSITION));
-	m_positionQuad->setSize(width, height);
-	m_positionQuad->getMesh()->getData()->clearTextureCoords();
-	m_positionQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
-	m_positionQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
-	m_positionQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
-	m_positionQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
-	m_positionQuad->getMesh()->updateTextureCoords();
-	m_positionQuad->setPosition(width - (width / 5), 0);
-	m_positionQuad->update();
-
-	m_normalQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
-	m_normalQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_NORMAL));
-	m_normalQuad->setSize(width, height);
-	m_normalQuad->getMesh()->getData()->clearTextureCoords();
-	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
-	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
-	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
-	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
-	m_normalQuad->getMesh()->updateTextureCoords();
-	m_normalQuad->setPosition(width - (width / 5), (height / 5));
-	m_normalQuad->update();
-
-	m_colourQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
-	m_colourQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_COLOUR));
-	m_colourQuad->setSize(width, height);
-	m_colourQuad->getMesh()->getData()->clearTextureCoords();
-	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
-	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
-	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
-	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
-	m_colourQuad->getMesh()->updateTextureCoords();
-	m_colourQuad->setPosition(width - (width / 5), (height / 5) * 2);
-	m_colourQuad->update();
+	Renderer::disableDeferredRendering();
 
 	m_worldPositionQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
 	m_worldPositionQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_WORLD_POSITION));
@@ -226,8 +225,44 @@ void DeferredRenderer::initialise() {
 	m_worldPositionQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
 	m_worldPositionQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
 	m_worldPositionQuad->getMesh()->updateTextureCoords();
-	m_worldPositionQuad->setPosition(width - (width / 5), (height / 5) * 3);
+	m_worldPositionQuad->setPosition(width - (width / 5), 0);
 	m_worldPositionQuad->update();
+
+	m_colourQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
+	m_colourQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_COLOUR));
+	m_colourQuad->setSize(width, height);
+	m_colourQuad->getMesh()->getData()->clearTextureCoords();
+	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_colourQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_colourQuad->getMesh()->updateTextureCoords();
+	m_colourQuad->setPosition(width - (width / 5), (height / 5));
+	m_colourQuad->update();
+
+	m_normalQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
+	m_normalQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_NORMAL));
+	m_normalQuad->setSize(width, height);
+	m_normalQuad->getMesh()->getData()->clearTextureCoords();
+	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_normalQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_normalQuad->getMesh()->updateTextureCoords();
+	m_normalQuad->setPosition(width - (width / 5), (height / 5) * 2);
+	m_normalQuad->update();
+
+	m_shininessQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
+	m_shininessQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_SHININESS));
+	m_shininessQuad->setSize(width, height);
+	m_shininessQuad->getMesh()->getData()->clearTextureCoords();
+	m_shininessQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 1));
+	m_shininessQuad->getMesh()->getData()->addTextureCoord(Vector2f(0, 0));
+	m_shininessQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 0));
+	m_shininessQuad->getMesh()->getData()->addTextureCoord(Vector2f(1, 1));
+	m_shininessQuad->getMesh()->updateTextureCoords();
+	m_shininessQuad->setPosition(width - (width / 5), (height / 5) * 3);
+	m_shininessQuad->update();
 
 	m_depthQuad = new RenderableObject2D(MeshBuilder::createQuad(width / 5, height / 5, new Texture(), Colour::WHITE));
 	m_depthQuad->getMesh()->setTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_DEPTH));
@@ -242,22 +277,57 @@ void DeferredRenderer::initialise() {
 	m_depthQuad->update();
 }
 
-void DeferredRenderer::renderToScreen() {
+void DeferredRenderer::renderToScreen(bool bindBuffers, bool unbindBuffers) {
 	if (m_screenQuad != NULL) {
 		Renderer::addCamera(m_camera);
 
-		m_screenQuad->render();
+		Shader* currentShader = Renderer::getShader(m_screenQuad->getMesh()->getShaderType());
+		if (currentShader != NULL) {
+			Matrix4f mvp = (Renderer::getCamera()->getProjectionViewMatrix() * m_screenQuad->getModelMatrix()).transpose();
+			currentShader->use();
 
-		if (Game::current->getSettings()->getDebuggingShowDeferredRenderingBuffers()) {
-			m_positionQuad->render();
-			m_normalQuad->render();
-			m_colourQuad->render();
-			m_worldPositionQuad->render();
-			m_depthQuad->render();
+			GLuint b1 = 0;
+			GLuint b2 = 0;
+			GLuint b3 = 0;
+			GLuint b4 = 0;
+
+			if (bindBuffers) {
+				b1 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_WORLD_POSITION));
+				b2 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_COLOUR));
+				b3 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_NORMAL));
+				b4 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_SHININESS));
+			} else {
+				b4 = Renderer::getNumBoundTextures() - 1;
+				b3 = b4 - 1;
+				b2 = b3 - 1;
+				b1 = b2 - 1;
+			}
+
+			glUniform1i(currentShader->getUniformLocation("WorldPositionBuffer"), b1);
+			glUniform1i(currentShader->getUniformLocation("ColourBuffer"), b2);
+			glUniform1i(currentShader->getUniformLocation("NormalBuffer"), b3);
+			glUniform1i(currentShader->getUniformLocation("ShininessBuffer"), b4);
+
+			glUniformMatrix4fv(currentShader->getUniformLocation("ModelViewProjectionMatrix"), 1, GL_FALSE, &(mvp.m_values[0][0]));
+			m_screenQuad->getMesh()->render();
+			currentShader->stopUsing();
+
+			if (unbindBuffers)
+				Renderer::unbindTetxures();
 		}
 
 		Renderer::removeCamera();
 	}
+}
+
+void DeferredRenderer::renderBuffers() {
+	Renderer::addCamera(m_camera);
+	m_worldPositionQuad->render();
+	m_colourQuad->render();
+	m_normalQuad->render();
+	m_shininessQuad->render();
+	m_depthQuad->render();
+	Renderer::removeCamera();
 }
 
 /***************************************************************************************************/

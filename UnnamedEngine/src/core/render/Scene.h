@@ -47,6 +47,7 @@ public:
 
 	void update();
 	void render(Vector3f cameraPosition);
+	void renderFinal(Vector3f cameraPosition); //For deferred rendering
 
 	/* The setters and getters */
 	inline void setLightingEnabled(bool lightingEnabled) { m_lightingEnabled = lightingEnabled; }

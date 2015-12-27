@@ -29,9 +29,17 @@
 
 class FBO {
 private:
+	/* The FBO target and pointer */
 	GLuint m_target;
 	GLuint m_pointer;
 
+	/* The array of attachments that need to be written to */
+	GLuint* m_attachments;
+
+	/* The number of attachments */
+	unsigned int m_numAttachments;
+
+	/* The various buffers (textures) in this FBO */
 	std::vector<RenderTexture*> m_textures;
 
 public:
@@ -45,6 +53,7 @@ public:
 	void unbind();
 
 	inline RenderTexture* getTexture(int texture) { return m_textures.at(texture); }
+	inline unsigned int getNumAttachments() { return m_numAttachments; }
 };
 
 /***************************************************************************************************/

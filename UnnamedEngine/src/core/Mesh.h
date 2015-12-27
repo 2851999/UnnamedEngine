@@ -43,10 +43,10 @@ private:
 	std::vector<unsigned int> m_indices;
 
 	/* The values that determine whether certain data should be kept in separate VBO's (True by default) */
-	bool m_separatePositions = true;
-	bool m_separateColours   = true;
-	bool m_separateTextureCoords = true;
-	bool m_separateNormals   = true;
+	bool m_separatePositions;
+	bool m_separateColours;
+	bool m_separateTextureCoords;
+	bool m_separateNormals;
 
 	/* The number of each value that is stored */
 	unsigned int m_numPositions = 0;
@@ -55,16 +55,14 @@ private:
 	unsigned int m_numNormals = 0;
 	unsigned int m_numIndices = 0;
 public:
-	MeshData() {
+	MeshData(bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true, bool separateNormals = true) {
 		m_positions     = std::vector<float>();
 		m_colours       = std::vector<float>();
 		m_normals       = std::vector<float>();
 		m_textureCoords = std::vector<float>();
 		m_other         = std::vector<float>();
 		m_indices       = std::vector<unsigned int>();
-	}
 
-	MeshData(bool separatePositions, bool separateColours, bool separateTextureCoords, bool separateNormals) : MeshData() {
 		m_separatePositions = separatePositions;
 		m_separateColours = separateColours;
 		m_separateTextureCoords = separateTextureCoords;
@@ -249,19 +247,20 @@ public:
 class MeshBuilder {
 public:
 	//2D stuff
-	static inline Mesh* createQuad(Vector2f topLeft, Vector2f bottomRight) { return createQuad(topLeft, bottomRight, "Basic"); }
-	static inline Mesh* createQuad(float width, float height) { return createQuad(width, height, "Basic"); }
-	static inline Mesh* createQuad(float width, float height, Colour colour) { return createQuad(width, height, colour, "Basic"); }
-	static inline Mesh* createQuad(float width, float height, Colour colours[], int n) { return createQuad(width, height, colours, n, "Basic"); }
-	static inline Mesh* createQuad(float width, float height, Texture* texture, Colour colour) { return createQuad(width, height, texture, colour, "Basic"); }
-	static inline Mesh* createQuad(float width, float height, Texture* texture, Colour colours[], int n) { return createQuad(width, height, texture, colours, n, "Basic"); }
 
-	static Mesh* createQuad(Vector2f topLeft, Vector2f bottomRight, std::string shaderType);
-	static Mesh* createQuad(float width, float height, std::string shaderType);
-	static Mesh* createQuad(float width, float height, Colour colour, std::string shaderType);
-	static Mesh* createQuad(float width, float height, Colour colours[], int n, std::string shaderType);
-	static Mesh* createQuad(float width, float height, Texture* texture, Colour colour, std::string shaderType);
-	static Mesh* createQuad(float width, float height, Texture* texture, Colour colours[], int n, std::string shaderType);
+	static inline Mesh* createQuad(Vector2f topLeft, Vector2f bottomRight, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createQuad(topLeft, bottomRight, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createQuad(float width, float height, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createQuad(width, height, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createQuad(float width, float height, Colour colour, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createQuad(width, height, colour, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createQuad(float width, float height, Colour colours[], int n, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createQuad(width, height, colours, n, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createQuad(float width, float height, Texture* texture, Colour colour, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createQuad(width, height, texture, colour, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createQuad(float width, float height, Texture* texture, Colour colours[], int n, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createQuad(width, height, texture, colours, n, "Basic", separatePositions, separateColours, separateTextureCoords); }
+
+	static Mesh* createQuad(Vector2f topLeft, Vector2f bottomRight, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createQuad(float width, float height, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createQuad(float width, float height, Colour colour, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createQuad(float width, float height, Colour colours[], int n, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createQuad(float width, float height, Texture* texture, Colour colour, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createQuad(float width, float height, Texture* texture, Colour colours[], int n, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
 
 	static void addQuadV(MeshData* data, float width, float height);
 	static void addQuadV(MeshData* data, Vector2f topLeft, Vector2f bottomRight);
@@ -271,21 +270,22 @@ public:
 	static void addQuadT(MeshData* data, Texture* texture);
 
 	//3D stuff
-	static inline Mesh* createCube(float width, float height, float depth) { return createCube(width, height, depth, "Basic"); }
-	static inline Mesh* createCube(float width, float height, float depth, Colour colour) { return createCube(width, height, depth, colour, "Basic"); }
-	static inline Mesh* createCube(float width, float height, float depth, Colour colours[], int n) { return createCube(width, height, depth, colours, n, "Basic"); }
-	static inline Mesh* createCube(float width, float height, float depth, Texture* texture, Colour colour) { return createCube(width, height, depth, texture, colour, "Basic"); }
-	static inline Mesh* createCube(float width, float height, float depth, Texture* texture, Colour colours[], int n) { return createCube(width, height, depth, texture, colours, n, "Basic"); }
-	static inline Mesh* createCube(float width, float height, float depth, Texture* textures[], Colour colour) { return createCube(width, height, depth, textures, colour, "Basic"); }
-	static inline Mesh* createCube(float width, float height, float depth, Texture* textures[], Colour colours[], int n) { return createCube(width, height, depth, textures, colours, n, "Basic"); }
 
-	static Mesh* createCube(float width, float height, float depth, std::string shaderType);
-	static Mesh* createCube(float width, float height, float depth, Colour colour, std::string shaderType);
-	static Mesh* createCube(float width, float height, float depth, Colour colours[], int n, std::string shaderType);
-	static Mesh* createCube(float width, float height, float depth, Texture* texture, Colour colour, std::string shaderType);
-	static Mesh* createCube(float width, float height, float depth, Texture* texture, Colour colours[], int n, std::string shaderType);
-	static Mesh* createCube(float width, float height, float depth, Texture* textures[], Colour colour, std::string shaderType);
-	static Mesh* createCube(float width, float height, float depth, Texture* textures[], Colour colours[], int n, std::string shaderType);
+	static inline Mesh* createCube(float width, float height, float depth, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createCube(width, height, depth, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createCube(float width, float height, float depth, Colour colour, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createCube(width, height, depth, colour, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createCube(float width, float height, float depth, Colour colours[], int n, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createCube(width, height, depth, colours, n, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createCube(float width, float height, float depth, Texture* texture, Colour colour, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createCube(width, height, depth, texture, colour, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createCube(float width, float height, float depth, Texture* texture, Colour colours[], int n, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createCube(width, height, depth, texture, colours, n, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createCube(float width, float height, float depth, Texture* textures[], Colour colour, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createCube(width, height, depth, textures, colour, "Basic", separatePositions, separateColours, separateTextureCoords); }
+	static inline Mesh* createCube(float width, float height, float depth, Texture* textures[], Colour colours[], int n, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true) { return createCube(width, height, depth, textures, colours, n, "Basic", separatePositions, separateColours, separateTextureCoords); }
+
+	static Mesh* createCube(float width, float height, float depth, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createCube(float width, float height, float depth, Colour colour, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createCube(float width, float height, float depth, Colour colours[], int n, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createCube(float width, float height, float depth, Texture* texture, Colour colour, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createCube(float width, float height, float depth, Texture* texture, Colour colours[], int n, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createCube(float width, float height, float depth, Texture* textures[], Colour colour, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
+	static Mesh* createCube(float width, float height, float depth, Texture* textures[], Colour colours[], int n, std::string shaderType, bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true);
 
 	static void addCubeV(MeshData* data, float width, float height, float depth);
 	static void addCubeI(MeshData* data);

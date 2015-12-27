@@ -77,7 +77,7 @@ void LightingTest::created() {
 
 	camera->setSkyBox(skybox);
 	Renderer::addCamera(camera);
-//	model = Model::loadModel("C:/UnnamedEngine/Models/mitsuba/", "mitsuba-sphere-blue.obj");
+//	model = Model::loadModel("C:/UnnamedEngine/Models/mitsuba/", "mitsuba-sphere-blue.obj", "SpotLight");
 //	model->position.setY(-1);
 	model = Model::loadModel("C:/UnnamedEngine/Models/head/", "head.obj", "SpotLight");
 //	model = Model::loadModel("C:/UnnamedEngine/Models/crytek-sponza/", "sponza.obj", "SpotLight");
@@ -87,10 +87,11 @@ void LightingTest::created() {
 
 	scene = new Scene();
 	scene->add(model);
-	scene->setLightingEnabled(false);
+	scene->setLightingEnabled(true);
 
-	if (! scene->isLightingEnabled())
+	if (! scene->isLightingEnabled()) {
 		model->setShaderType("Material");
+	}
 
 	directionalLight = new DirectionalLight(new BaseLight(Colour::WHITE, 1.0f), Vector3f(0.0, 0.0, 1.0));
 
@@ -111,6 +112,8 @@ void LightingTest::created() {
 //	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
 //	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
 //	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
+
+	//12 - 214
 
 	Mouse::lock();
 }
@@ -156,6 +159,21 @@ void LightingTest::render() {
 	if (wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	if (getSettings()->getVideoDeferredRendering()) {
+		Renderer::setShader(Renderer::getShader("DeferredShader"));
+		DeferredRenderer::start();
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_TEXTURE_2D);
+
+		scene->render(camera->position);
+
+		DeferredRenderer::stop();
+		Renderer::resetShader();
+	} else {
+		scene->render(camera->position);
+	}
+
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
 
@@ -170,10 +188,14 @@ void LightingTest::render() {
 //	scene->render();
 //
 //	Renderer::resetShader();
-	scene->render(camera->position);
 
 	if (wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+	if (getSettings()->getVideoDeferredRendering()) {
+		scene->renderFinal(camera->position);
+	}
 }
 
 void LightingTest::destroy() {

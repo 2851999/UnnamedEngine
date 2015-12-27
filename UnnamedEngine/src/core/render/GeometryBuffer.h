@@ -30,11 +30,11 @@ private:
 	FBO* m_fbo;
 public:
 	/* The various buffers */
-	static const int BUFFER_POSITION = 0;
-	static const int BUFFER_COLOUR   = 1;
-	static const int BUFFER_NORMAL   = 2;
-	static const int BUFFER_WORLD_POSITION = 3;
-	static const int BUFFER_DEPTH    = 4;
+	static const int BUFFER_WORLD_POSITION = 0;
+	static const int BUFFER_COLOUR    = 1;
+	static const int BUFFER_NORMAL    = 2;
+	static const int BUFFER_SHININESS = 3;
+	static const int BUFFER_DEPTH     = 4;
 
 	GeometryBuffer();
 

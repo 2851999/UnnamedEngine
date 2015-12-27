@@ -274,45 +274,45 @@ MeshRenderData::~MeshRenderData() {
  * The MeshBuilder class provides various methods to make Mesh objects
  ***************************************************************************************************/
 
-Mesh* MeshBuilder::createQuad(float width, float height, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createQuad(float width, float height, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addQuadV(data, Vector2f(0, 0), Vector2f(width, height));
 	addQuadI(data);
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createQuad(Vector2f topLeft, Vector2f bottomRight, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createQuad(Vector2f topLeft, Vector2f bottomRight, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addQuadV(data, topLeft, bottomRight);
 	addQuadI(data);
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createQuad(float width, float height, Colour colour, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createQuad(float width, float height, Colour colour, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addQuadV(data, Vector2f(0, 0), Vector2f(width, height));
 	addQuadI(data);
 	addQuadC(data, colour);
 	return new Mesh(data, shaderType);
 }
-Mesh* MeshBuilder::createQuad(float width, float height, Colour colours[], int n, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createQuad(float width, float height, Colour colours[], int n, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addQuadV(data, Vector2f(0, 0), Vector2f(width, height));
 	addQuadI(data);
 	addQuadC(data, colours, n);
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createQuad(float width, float height, Texture* texture, Colour colour, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createQuad(float width, float height, Texture* texture, Colour colour, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addQuadV(data, Vector2f(0, 0), Vector2f(width, height));
 	addQuadI(data);
 	addQuadC(data, colour);
 	addQuadT(data, texture);
 	return new Mesh(data, shaderType);
 }
-Mesh* MeshBuilder::createQuad(float width, float height, Texture* texture, Colour colours[], int n, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createQuad(float width, float height, Texture* texture, Colour colours[], int n, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addQuadV(data, Vector2f(0, 0), Vector2f(width, height));
 	addQuadI(data);
 	addQuadC(data, colours, n);
@@ -373,31 +373,31 @@ void MeshBuilder::addQuadT(MeshData* data, Texture* texture) {
 
 //Start of 3D stuff
 
-Mesh* MeshBuilder::createCube(float width, float height, float depth, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createCube(float width, float height, float depth, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addCubeV(data, width, height, depth);
 	addCubeI(data);
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createCube(float width, float height, float depth, Colour colour, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createCube(float width, float height, float depth, Colour colour, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addCubeV(data, width, height, depth);
 	addCubeI(data);
 	addCubeC(data, colour);
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createCube(float width, float height, float depth, Colour colours[], int n, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createCube(float width, float height, float depth, Colour colours[], int n, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addCubeV(data, width, height, depth);
 	addCubeI(data);
 	addCubeC(data, colours, n);
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* texture, Colour colour, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* texture, Colour colour, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addCubeV(data, width, height, depth);
 	addCubeI(data);
 	addCubeC(data, colour);
@@ -405,8 +405,8 @@ Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* t
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* texture, Colour colours[], int n, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* texture, Colour colours[], int n, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addCubeV(data, width, height, depth);
 	addCubeI(data);
 	addCubeC(data, colours, n);
@@ -414,8 +414,8 @@ Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* t
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* textures[], Colour colour, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* textures[], Colour colour, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addCubeV(data, width, height, depth);
 	addCubeI(data);
 	addCubeC(data, colour);
@@ -423,8 +423,8 @@ Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* t
 	return new Mesh(data, shaderType);
 }
 
-Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* textures[], Colour colours[], int n, std::string shaderType) {
-	MeshData* data = new MeshData();
+Mesh* MeshBuilder::createCube(float width, float height, float depth, Texture* textures[], Colour colours[], int n, std::string shaderType, bool separatePositions, bool separateColours, bool separateTextureCoords) {
+	MeshData* data = new MeshData(separatePositions, separateColours, separateTextureCoords);
 	addCubeV(data, width, height, depth);
 	addCubeI(data);
 	addCubeC(data, colours, n);

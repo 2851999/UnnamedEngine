@@ -1,7 +1,5 @@
 #version 140
 
-#include "MaterialData.glsl"
-
 struct BaseLight {
 	vec3 colour;
 	float intensity;
@@ -35,16 +33,7 @@ uniform vec4 ambientLight;
 uniform float specularIntensity;
 uniform vec3 eyePosition;
 
-in vec3 frag_vertex;
-in vec2 frag_textureCoord;
-in vec3 frag_normal;
-
-in vec3 frag_worldPosition;
-
-/* The fragment colour */
-out vec4 FragColor;
-
-vec4 calculateLight(BaseLight base, vec3 direction, vec3 normal) {
+vec4 calculateLight(BaseLight base, vec3 direction, vec3 normal, float shininess, vec4 diffuseMaterialColour) {
 	float diffuseFactor = max(dot(normal, -direction), 0.0);
 	vec4 diffuseColour = vec4(0.0, 0.0, 0.0, 0.0);
 	vec4 specularColour = vec4(0.0, 0.0, 0.0, 0.0);
@@ -55,19 +44,19 @@ vec4 calculateLight(BaseLight base, vec3 direction, vec3 normal) {
 		float specAngle = max(dot(reflectDir, normalize(eyePosition)), 0.0);
 		
 		if (specAngle > 0.0) {
-			float specularFactor = pow(specAngle, material.shininess);
+			float specularFactor = pow(specAngle, shininess);
 			specularColour = vec4(base.colour, 1.0) * specularIntensity * specularFactor;
 		}
 	}
-	return (diffuseColour + specularColour) * material.diffuseColour * texture2D(material.diffuseTexture, frag_textureCoord);
+	return (diffuseColour + specularColour) * diffuseMaterialColour;
 }
 
-vec4 calculateDirectionalLight(DirectionalLight directionalLight, vec3 normal) {
-	return calculateLight(directionalLight.base, -directionalLight.direction, normal);
+vec4 calculateDirectionalLight(DirectionalLight directionalLight, vec3 normal, float shininess, vec4 diffuseMaterialColour) {
+	return calculateLight(directionalLight.base, -directionalLight.direction, normal, shininess, diffuseMaterialColour);
 }
 
-vec4 calculatePointLight(PointLight pointLight, vec3 normal) {
-	vec3 lightDirection = frag_worldPosition - pointLight.position;
+vec4 calculatePointLight(PointLight pointLight, vec3 worldPosition, vec3 normal, float shininess, vec4 diffuseMaterialColour) {
+	vec3 lightDirection = worldPosition - pointLight.position;
 	float distanceToLight = length(lightDirection);
 	
 	if (distanceToLight > pointLight.range)
@@ -75,7 +64,7 @@ vec4 calculatePointLight(PointLight pointLight, vec3 normal) {
 	
 	lightDirection = normalize(lightDirection);
 	
-	vec4 colour = calculateLight(pointLight.base, lightDirection, normal);
+	vec4 colour = calculateLight(pointLight.base, lightDirection, normal, shininess, diffuseMaterialColour);
 	
 	float attenuation = pointLight.attenuation.constant +
 						pointLight.attenuation.linear * distanceToLight +
@@ -84,13 +73,13 @@ vec4 calculatePointLight(PointLight pointLight, vec3 normal) {
 	return vec4(colour.xyz / attenuation, colour.w);
 }
 
-vec4 calculateSpotLight(SpotLight spotLight, vec3 normal) {
-	vec3 lightDirection = normalize(frag_worldPosition - spotLight.pointLight.position);
+vec4 calculateSpotLight(SpotLight spotLight, vec3 worldPosition, vec3 normal, float shininess, vec4 diffuseMaterialColour) {
+	vec3 lightDirection = normalize(worldPosition - spotLight.pointLight.position);
 	float spotFactor = dot(lightDirection, spotLight.direction);
 	vec4 colour = vec4(0.0, 0.0, 0.0, 1.0);
 	
 	if (spotFactor > spotLight.cutoff) {
-		colour = calculatePointLight(spotLight.pointLight, normal);
+		colour = calculatePointLight(spotLight.pointLight, worldPosition, normal, shininess, diffuseMaterialColour);
 		colour = vec4(colour.xyz *
 				(1.0 - (1.0 - spotFactor) / (1.0 - spotLight.cutoff)), colour.w); //Give it a softer edge - could have /0
 	}
