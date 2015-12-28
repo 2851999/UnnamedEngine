@@ -67,7 +67,7 @@ void BitmapText::update(std::string text) {
 
 			x += ((m_cellWidth / m_cellHeight) * m_fontSize) / 1.5f;
 		}
-		getMesh()->updateVertices();
+		getMesh()->updatePositions();
 		getMesh()->updateColours();
 		getMesh()->updateTextureCoords();
 		getMesh()->updateIndices();

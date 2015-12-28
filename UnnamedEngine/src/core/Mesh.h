@@ -39,6 +39,8 @@ private:
 	std::vector<float> m_colours;
 	std::vector<float> m_normals;
 	std::vector<float> m_textureCoords;
+	std::vector<float> m_tangents;
+	std::vector<float> m_bitangents;
 	std::vector<float> m_other;
 	std::vector<unsigned int> m_indices;
 
@@ -47,19 +49,25 @@ private:
 	bool m_separateColours;
 	bool m_separateTextureCoords;
 	bool m_separateNormals;
+	bool m_separateTangents;
+	bool m_separateBitangents;
 
 	/* The number of each value that is stored */
 	unsigned int m_numPositions = 0;
 	unsigned int m_numColours = 0;
 	unsigned int m_numTextureCoordinates = 0;
 	unsigned int m_numNormals = 0;
+	unsigned int m_numTangents = 0;
+	unsigned int m_numBitangents = 0;
 	unsigned int m_numIndices = 0;
 public:
-	MeshData(bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true, bool separateNormals = true) {
+	MeshData(bool separatePositions = true, bool separateColours = true, bool separateTextureCoords = true, bool separateNormals = true, bool separateTangents = true, bool separateBitangents = true) {
 		m_positions     = std::vector<float>();
 		m_colours       = std::vector<float>();
 		m_normals       = std::vector<float>();
 		m_textureCoords = std::vector<float>();
+		m_tangents      = std::vector<float>();
+		m_bitangents    = std::vector<float>();
 		m_other         = std::vector<float>();
 		m_indices       = std::vector<unsigned int>();
 
@@ -67,6 +75,8 @@ public:
 		m_separateColours = separateColours;
 		m_separateTextureCoords = separateTextureCoords;
 		m_separateNormals = separateNormals;
+		m_separateTangents = separateTangents;
+		m_separateBitangents = separateBitangents;
 	}
 
 	inline void addPosition(Vector3f position) {
@@ -117,19 +127,48 @@ public:
 		}
 		m_numTextureCoordinates++;
 	}
+	inline void addTangent(Vector3f tangent) {
+		if (m_separateTangents) {
+			m_tangents.push_back(tangent.getX());
+			m_tangents.push_back(tangent.getY());
+			m_tangents.push_back(tangent.getZ());
+		} else {
+			m_other.push_back(tangent.getX());
+			m_other.push_back(tangent.getY());
+			m_other.push_back(tangent.getZ());
+		}
+		m_numTangents++;
+	}
+	inline void addBitangent(Vector3f bitangent) {
+		if (m_separateBitangents) {
+			m_bitangents.push_back(bitangent.getX());
+			m_bitangents.push_back(bitangent.getY());
+			m_bitangents.push_back(bitangent.getZ());
+		} else {
+			m_other.push_back(bitangent.getX());
+			m_other.push_back(bitangent.getY());
+			m_other.push_back(bitangent.getZ());
+		}
+		m_numBitangents++;
+	}
+
 	inline void addIndex(unsigned int index)           { m_indices.push_back(index); m_numIndices++; }
 
 	inline std::vector<float> getPositions()        { return m_positions;                      }
 	inline std::vector<float> getColours()          { return m_colours;                        }
 	inline std::vector<float> getNormals()          { return m_normals;                        }
 	inline std::vector<float> getTextureCoords()    { return m_textureCoords;                  }
-	inline std::vector<float> getOthers()   		{ return m_other;                        }
+	inline std::vector<float> getTangents()         { return m_tangents;                       }
+	inline std::vector<float> getBitangents()       { return m_bitangents;                     }
+	inline std::vector<float> getOthers()   		{ return m_other;                          }
 	inline std::vector<unsigned int> getIndices()   { return m_indices;                        }
 
 	inline bool separatePositions() { return m_separatePositions; }
 	inline bool separateColours() { return m_separateColours; }
 	inline bool separateTextureCoords() { return m_separateTextureCoords; }
 	inline bool separateNormals() { return m_separateNormals; }
+	inline bool separateTangents() { return m_separateTangents; }
+	inline bool separateBitangents() { return m_separateBitangents; }
 
 	inline void clearPositions() { m_positions.clear(); m_numPositions = 0; }
 	inline void clearColours() { m_colours.clear(); m_numColours = 0; }
@@ -140,12 +179,16 @@ public:
 	inline bool hasColours()       { return m_numColours > 0; }
 	inline bool hasTextureCoords() { return m_numTextureCoordinates > 0; }
 	inline bool hasNormals()       { return m_numNormals > 0; }
+	inline bool hasTangents()      { return m_numTangents > 0; }
+	inline bool hasBitangents()    { return m_numBitangents > 0; }
 	inline bool hasIndices()       { return m_numIndices > 0; }
 
 	inline unsigned int getNumPositions() { return m_numPositions; }
 	inline unsigned int getNumColours() { return m_numColours; }
 	inline unsigned int getNumTextureCoords() { return m_numTextureCoordinates; }
 	inline unsigned int getNumNormals() { return m_numNormals; }
+	inline unsigned int getNumTangents() { return m_numTangents; }
+	inline unsigned int getNumBitangents() { return m_numBitangents; }
 	inline unsigned int getNumIndices() { return m_numIndices; }
 };
 
@@ -159,6 +202,8 @@ private:
 	GLuint m_colour_vbo       = -1;
 	GLuint m_normal_vbo       = -1;
 	GLuint m_textureCoord_vbo = -1;
+	GLuint m_tangent_vbo       = -1;
+	GLuint m_bitangent_vbo       = -1;
 	GLuint m_indices_vbo      = -1;
 	GLuint m_other_vbo        = -1;
 
@@ -171,12 +216,18 @@ private:
 	int m_textureCoordsStride = 0;
 	int m_normalsOffset   = 0;
 	int m_normalsStride   = 0;
+	int m_tangentsOffset   = 0;
+	int m_tangentsStride   = 0;
+	int m_bitangentsOffset   = 0;
+	int m_bitangentsStride   = 0;
 
 	/* The usage values */
 	int m_positionsUsage = GL_STATIC_DRAW;
 	int m_coloursUsage  = GL_STATIC_DRAW;
 	int m_textureCoordsUsage = GL_STATIC_DRAW;
 	int m_normalsUsage  = GL_STATIC_DRAW;
+	int m_tangentsUsage  = GL_STATIC_DRAW;
+	int m_bitangentsUsage  = GL_STATIC_DRAW;
 	int m_otherUsage    = GL_STATIC_DRAW;
 	int m_indicesUsage  = GL_STATIC_DRAW;
 
@@ -199,7 +250,7 @@ public:
 
 	void render();
 
-	void updateVertices(MeshData* data);
+	void updatePositions(MeshData* data);
 	void updateColours(MeshData* data);
 	void updateTextureCoords(MeshData* data);
 	void updateIndices(MeshData* data);
@@ -229,7 +280,7 @@ public:
 	inline bool hasTexture() { return m_texture != NULL; }
 	inline MeshData* getData() { return m_data; }
 	inline MeshRenderData* getRenderData() { return m_renderData; }
-	inline void updateVertices() { m_renderData->updateVertices(m_data); }
+	inline void updatePositions() { m_renderData->updatePositions(m_data); }
 	inline void updateColours() { m_renderData->updateColours(m_data); }
 	inline void updateTextureCoords() { m_renderData->updateTextureCoords(m_data); }
 	inline void updateIndices() { m_renderData->updateIndices(m_data); }

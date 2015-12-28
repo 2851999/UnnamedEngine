@@ -39,6 +39,7 @@ public:
 	Window(Settings* settings);
 	virtual ~Window();
 
+	static inline bool init() { return glfwInit(); }
 	bool create();
 	void update();
 	void destroy();

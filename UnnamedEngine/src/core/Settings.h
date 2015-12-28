@@ -48,7 +48,7 @@ const Vector2i VIDEO_RESOLUTION_4K        = VIDEO_RESOLUTION_3840x2160;
 class Settings {
 private:
 	/* The values that correspond to the window */
-	const char* m_window_title;
+	std::string m_window_title;
 	int         m_window_width;
 	int         m_window_height;
 	bool        m_window_resizable;
@@ -86,7 +86,7 @@ public:
 
 	/* The method that sets the default settings */
 	void setDefault() {
-		m_window_title       = (std::string(ENGINE_NAME) + " " + std::string(ENGINE_VERSION) + " (" + std::string(ENGINE_VERSION_NAME) + ")").c_str();
+		m_window_title       = std::string(ENGINE_NAME) + " " + std::string(ENGINE_VERSION) + " (" + std::string(ENGINE_VERSION_NAME) + ")";
 		m_window_resizable   = false;
 		m_window_decorated   = true;
 		m_window_fullscreen  = false;
@@ -109,7 +109,7 @@ public:
 
 	/* Define all of the methods used to assign and get values stored
 	 * in this class */
-	inline void setWindowTitle(const char* title)    { m_window_title       = title;      }
+	inline void setWindowTitle(std::string title)    { m_window_title       = title;      }
 	inline void setWindowWidth(int width)            { m_window_width       = width;      }
 	inline void setWindowHeight(int height)          { m_window_height      = height;     }
 	inline void setWindowSize(int width, int height) { m_window_width       = width;
@@ -133,7 +133,7 @@ public:
 	inline void setDebggingShowInformation(bool debuggingShowInformation) { m_debugging_show_information = debuggingShowInformation; }
 	inline void setDebuggingShowDeferredRenderingBuffers(bool debuggingShowDeferredRenderingBuffers) { m_debugging_show_deferred_rendering_buffers = debuggingShowDeferredRenderingBuffers; }
 
-	inline const char* getWindowTitle()                    { return m_window_title;            }
+	inline std::string getWindowTitle()                    { return m_window_title;            }
 	inline int         getWindowWidth()                    { return m_window_width;            }
 	inline int         getWindowHeight()                   { return m_window_height;           }
 	inline bool        getWindowResizable()                { return m_window_resizable;        }

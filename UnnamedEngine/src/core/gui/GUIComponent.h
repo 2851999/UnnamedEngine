@@ -257,19 +257,13 @@ public:
 
 class GUIFill : public Object2D {
 public:
-	GUIComponent* component;
-	GUIComponentRenderer* renderer;
-	Colour colour;
-	Texture* texture;
-	float lastWidth;
-	float lastHeight;
+	GUIComponent* component = NULL;
+	GUIComponentRenderer* renderer = NULL;
+	Colour colour = Colour(-1, -1, -1, -1);
+	Texture* texture = NULL;
+	float lastWidth = 0;
+	float lastHeight = 0;
 	GUIFill() {
-		component = NULL;
-		renderer = NULL;
-		texture = NULL;
-		colour = Colour(-1, -1, -1, -1);
-		lastWidth = 0;
-		lastHeight = 0;
 	}
 	GUIFill(GUIComponent* component) {
 		setup(component);

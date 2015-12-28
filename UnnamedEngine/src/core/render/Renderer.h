@@ -64,6 +64,7 @@ public:
 			return m_overrideShader;
 	}
 	static void initialise();
+	static void initialiseShaders();
 	static void setupShader(Shader* shader, const char* type);
 	static void render(Mesh* mesh, Matrix4f modelMatrix, std::string shaderType);
 	static inline void render(Mesh* mesh, Matrix4f modelMatrix) { render(mesh, modelMatrix, mesh->getRenderData()->getShaderType()); }

@@ -73,7 +73,7 @@ void GUITest::initialise(Settings* settings) {
 }
 
 void GUITest::created() {
-	Renderer::initialise();
+	//Renderer::initialise();
 	//camera = Camera2D(Matrix4f().setOrphographic(0, 1280, 720, 0, -1, 1));
 	camera = new Camera2D(Matrix4f().initOrthographic(0, getSettings()->getWindowWidth(), getSettings()->getWindowHeight(), 0, -1, 1));
 	camera->update();
@@ -128,6 +128,13 @@ void GUITest::created() {
 	textBox->border = new GUIBorder(textBox, 1.0f, Colour::LIGHT_BLUE);
 	textBox->borderEnabled = true;
 	textBox->selection->setColour(Colour(Colour::LIGHT_BLUE, 0.2f));
+
+	loadingBar = new GUILoadingBar(10, Colour::WHITE, 300, 20);
+	loadingBar->setPosition(20, 340);
+	loadingBar->border = new GUIBorder(loadingBar, 1.0f, Colour::LIGHT_BLUE);
+	loadingBar->borderEnabled = true;
+	loadingBar->setCurrentStage(2);
+	loadingBar->setFillColour(Colour::LIGHT_BLUE);
 }
 
 void GUITest::update() {
@@ -137,6 +144,7 @@ void GUITest::update() {
 	list->update();
 	radio->update();
 	textBox->update();
+	loadingBar->update();
 }
 
 void GUITest::render() {
@@ -154,6 +162,7 @@ void GUITest::render() {
 	list->render();
 	radio->render();
 	textBox->render();
+	loadingBar->render();
 
 	renderInformation();
 }

@@ -31,8 +31,11 @@ Window::~Window() {
 }
 
 bool Window::create() {
+	//Initialise GLFW
 	if (! glfwInit())
 		return false;
+
+	//Setup the window properties
 	glfwDefaultWindowHints();
 	setResizable(m_settings->getWindowResizable());
 	setDecorated(m_settings->getWindowDecorated());
@@ -43,10 +46,14 @@ bool Window::create() {
 
 	Vector2i resolution = m_settings->getVideoResolution();
 	GLFWmonitor* monitor = NULL;
+
 	if (m_settings->getWindowFullscreen()) {
+		//Get the primary monitor for running fullscreen
 		monitor = glfwGetPrimaryMonitor();
 
+		//Check whether it should be windowed fullscreen mode
 		if (m_settings->getWindowBorderless()) {
+			//Get the default video mode and setup the window
 			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
 			glfwWindowHint(GLFW_RED_BITS, mode->redBits);
@@ -55,27 +62,33 @@ bool Window::create() {
 			glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 		}
 
-		m_instance = glfwCreateWindow(resolution.getX(), resolution.getY(), m_settings->getWindowTitle(), glfwGetPrimaryMonitor(), NULL);
-	}else
-		m_instance = glfwCreateWindow(resolution.getX(), resolution.getY(), m_settings->getWindowTitle(), monitor, NULL);
+		//Create the fullscreen window
+		m_instance = glfwCreateWindow(resolution.getX(), resolution.getY(), m_settings->getWindowTitle().c_str(), glfwGetPrimaryMonitor(), NULL);
+	} else
+		//Create the window
+		m_instance = glfwCreateWindow(resolution.getX(), resolution.getY(), m_settings->getWindowTitle().c_str(), monitor, NULL);
+
+	//Exit if the window instance wasn't created properly
 	if (! m_instance) {
 		glfwTerminate();
 		return false;
 	}
 
+	//Make this window the current context
 	this->makeCurrent();
+
+	//Get the actual rendering space's size
 	int width, height;
 	glfwGetFramebufferSize(m_instance, &width, &height);
 	m_settings->setWindowSize(width, height);
+
+	//Setup OpenGL to use the correct size
 	glScissor(0, 0, width, height);
 	glViewport(0, 0, width, height);
 
+	//Centre the window if it isn't fullscreen
 	if (! m_settings->getWindowFullscreen())
 		centre();
-
-	GLenum status = glewInit();
-	if (status)
-		logError("GLEW initialisation failed");
 
 	return true;
 }

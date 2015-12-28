@@ -79,9 +79,10 @@ void LightingTest::created() {
 	Renderer::addCamera(camera);
 //	model = Model::loadModel("C:/UnnamedEngine/Models/mitsuba/", "mitsuba-sphere-blue.obj", "SpotLight");
 //	model->position.setY(-1);
-	model = Model::loadModel("C:/UnnamedEngine/Models/head/", "head.obj", "SpotLight");
-//	model = Model::loadModel("C:/UnnamedEngine/Models/crytek-sponza/", "sponza.obj", "SpotLight");
-//	model->setScale(0.1f, 0.1f, 0.1f);
+	model = Model::loadModel("C:/UnnamedEngine/Models/head/", "head.obj", "DeferredShader");
+//	model = Model::loadModel("C:/UnnamedEngine/Models/", "buddha.obj", "SpotLight");
+	//model = Model::loadModel("C:/UnnamedEngine/Models/crytek-sponza/", "sponza.obj", "DeferredShader");
+	//model->setScale(0.1f, 0.1f, 0.1f);
 //	model->getMesh(0)->getRenderData()->getMaterial()->setShininess(10.0f);
 	model->update();
 
@@ -151,7 +152,7 @@ void LightingTest::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
-	//camera->useView();
+	camera->useView();
 
 	glEnable(GL_MULTISAMPLE_ARB);
 	glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
@@ -221,6 +222,8 @@ void LightingTest::onKeyPressed(int key) {
 			model->setShaderType("Material");
 		else
 			model->setShaderType("SpotLight");
+	} else if (key == GLFW_KEY_F8) {
+		Renderer::initialiseShaders();
 	} else if (key == GLFW_KEY_F3)
 		Mouse::toggleLock();
 }

@@ -24,7 +24,7 @@
  ***************************************************************************************************/
 
 SkyBox::SkyBox(std::string path, std::string front, std::string back, std::string left, std::string right, std::string top, std::string bottom, float size) {
-	m_box = RenderableObject3D(MeshBuilder::createCube(size, size, size, "SkyBox"));
+	m_box = RenderableObject3D(MeshBuilder::createCube(size, size, size, "SkyBox", false, false, false));
 	Texture* texture = new Texture(TextureParameters().setTarget(GL_TEXTURE_CUBE_MAP));
 	texture->bind();
 	Texture::loadTexture((path + back).c_str(), TextureParameters().setTarget(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z), false);

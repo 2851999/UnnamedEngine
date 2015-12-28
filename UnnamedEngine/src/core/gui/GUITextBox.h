@@ -31,13 +31,13 @@ class GUITextBox;
 
 class GUITextBoxCursor : public Object2D {
 public:
-	GUITextBox* textBox;
-	GUIComponentRenderer* renderer;
-	Timer* timer;
+	GUITextBox* textBox = NULL;
+	GUIComponentRenderer* renderer = NULL;
+	Timer* timer = NULL;
 	long timeBetweenBlink;
 	bool cursorShown;
 	Colour colour;
-	Texture* texture;
+	Texture* texture = NULL;
 
 	GUITextBoxCursor();
 	GUITextBoxCursor(GUITextBox* textBox, float thickness);
@@ -68,10 +68,10 @@ public:
 
 class GUITextBoxSelection : public Object2D {
 public:
-	GUITextBox* textBox;
-	GUIComponentRenderer* renderer;
-	Colour colour;
-	Texture* texture;
+	GUITextBox* textBox = NULL;
+	GUIComponentRenderer* renderer = NULL;
+	Colour colour = Colour(-1.0f, -1.0f, -1.0f, -1.0f);
+	Texture* texture = NULL;
 
 	GUITextBoxSelection();
 	GUITextBoxSelection(GUITextBox* textBox);
@@ -102,9 +102,9 @@ public:
 	bool masked;
 	std::string mask;
 	std::string defaultText;
-	Font* defaultTextFont;
+	Font* defaultTextFont = NULL;
 	unsigned int cursorIndex;
-	GUITextBoxCursor* cursor;
+	GUITextBoxCursor* cursor = NULL;
 
 	unsigned int viewIndexStart;
 	unsigned int viewIndexEnd;
@@ -114,9 +114,9 @@ public:
 	unsigned int selectionIndexStart;
 	unsigned int selectionIndexEnd;
 
-	GUITextBoxSelection* selection;
+	GUITextBoxSelection* selection = NULL;
 
-	KeyboardShortcuts* shortcuts;
+	KeyboardShortcuts* shortcuts = NULL;
 
 	GUITextBox(float width, float height);
 	GUITextBox(Colour colour, float width, float height);

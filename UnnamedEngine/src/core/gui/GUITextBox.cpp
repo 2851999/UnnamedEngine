@@ -25,12 +25,8 @@
  ***************************************************************************************************/
 
 GUITextBoxCursor::GUITextBoxCursor() {
-	timer = NULL;
 	timeBetweenBlink = 0;
 	cursorShown = false;
-	texture = NULL;
-	textBox = NULL;
-	renderer = NULL;
 	colour = Colour(-1.0f, -1.0f, -1.0f, -1.0f);
 }
 
@@ -113,10 +109,6 @@ void GUITextBoxCursor::showCursor() {
  ***************************************************************************************************/
 
 GUITextBoxSelection::GUITextBoxSelection() {
-	textBox = NULL;
-	texture = NULL;
-	renderer = NULL;
-	colour = Colour(-1.0f, -1.0f, -1.0f, -1.0f);
 }
 
 GUITextBoxSelection::GUITextBoxSelection(GUITextBox* textBox) {
@@ -184,7 +176,7 @@ void GUITextBoxSelection::render() {
 		float selectionHeight = textBox->getHeight();
 		renderer->entity->getMesh()->getData()->clearPositions();
 		MeshBuilder::addQuadV(renderer->entity->getMesh()->getData(), selectionWidth, selectionHeight);
-		renderer->entity->getMesh()->updateVertices();
+		renderer->entity->getMesh()->updatePositions();
 		position = Vector2f(selectionX, selectionY);
 		renderer->render(this, textBox->active);
 	}
@@ -484,6 +476,7 @@ void GUITextBox::deleteSelection() {
 
 void GUITextBox::componentOnClicked() {
 	selected = true;
+	resetSelection();
 	cursor->showCursor();
 }
 

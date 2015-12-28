@@ -99,6 +99,7 @@ private:
 public:
 	RenderShader() {}
 	RenderShader(Shader* defaultShader) { m_shaders.push_back(defaultShader); }
+	virtual ~RenderShader();
 	inline void addShader(Shader* shader) { m_shaders.push_back(shader); }
 	inline void removeShader(Shader* shader) { m_shaders.erase(m_shaders.end()); }
 	inline Shader* getShader() { return m_shaders.back(); }

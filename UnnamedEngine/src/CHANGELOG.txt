@@ -1,4 +1,20 @@
 --------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 4 (V0.1.5)
+
+* Added normal mapping
+
+* Models now load much faster
+
+* SkyBox is now interleaved
+
+* Fixed bug: GUIFill seemed to crash engine - seemed like a
+			 memory issue as the texture wasn't set to NULL
+* Fixed bug: GUITextBoxSelection had same issue
+* Fixed bug: GUITextBoxCursor had same issue
+* Fixed bug: Some sort of memory issue changing the window
+             title before creating the window
+
+--------------------------------------------------------------
 Release 0 | Beta 0 | Development 0 | Experimental 4 (V0.1.4)
 
 * Added deferred lighting

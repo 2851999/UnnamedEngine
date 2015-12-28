@@ -83,7 +83,7 @@ public:
 	Texture* getBackgroundTexture();
 	void setFillTexture(Texture* texture);
 	Texture* getFillTexture();
-	inline void setCurrentStage(unsigned int stage);
+	void setCurrentStage(unsigned int stage);
 	inline unsigned int getCurrentStage() { return currentLoadingStage; }
 
 	inline bool hasBackgroundColour() { return renderer->colours.size() > 0; }

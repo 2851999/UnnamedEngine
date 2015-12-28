@@ -128,6 +128,34 @@ void MeshRenderData::setup(MeshData* data, bool generateVBOs) {
 		useOther = true;
 	}
 
+	//Check for any tangents
+	if (data->hasTangents() && data->separateTangents()) {
+		//Setup the VBO
+		if (generateVBOs)
+			glGenBuffers(1, &m_tangent_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, m_tangent_vbo);
+		glBufferData(GL_ARRAY_BUFFER, data->getNumTangents() * 3 * sizeof(data->getTangents()[0]), &data->getTangents().front(), m_normalsUsage);
+
+		setupVertexAttribPointer("Tangent", shader, 3, 0, 0);
+	} else if (data->hasTangents()) {
+		currentStride += 3 * sizeof(data->getOthers()[0]);
+		useOther = true;
+	}
+
+	//Check for any bitangents
+	if (data->hasBitangents() && data->separateBitangents()) {
+		//Setup the VBO
+		if (generateVBOs)
+			glGenBuffers(1, &m_tangent_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, m_tangent_vbo);
+		glBufferData(GL_ARRAY_BUFFER, data->getNumBitangents() * 3 * sizeof(data->getBitangents()[0]), &data->getBitangents().front(), m_normalsUsage);
+
+		setupVertexAttribPointer("Bitangent", shader, 3, 0, 0);
+	} else if (data->hasBitangents()) {
+		currentStride += 3 * sizeof(data->getOthers()[0]);
+		useOther = true;
+	}
+
 	//Check to see whether the 'other' vbo is required
 	if (useOther) {
 		//The current offset needed
@@ -174,6 +202,24 @@ void MeshRenderData::setup(MeshData* data, bool generateVBOs) {
 
 			setupVertexAttribPointer("Normal", shader, 3, m_normalsOffset, m_normalsStride);
 		}
+
+		if (data->hasTangents() && ! data->separateTangents()) {
+			m_tangentsOffset = currentOffset;
+			m_tangentsStride = currentStride;
+
+			currentOffset += 3 * sizeof(data->getOthers()[0]);
+
+			setupVertexAttribPointer("Tangent", shader, 3, m_tangentsOffset, m_tangentsStride);
+		}
+
+		if (data->hasBitangents() && ! data->separateBitangents()) {
+			m_bitangentsOffset = currentOffset;
+			m_bitangentsStride = currentStride;
+
+			currentOffset += 3 * sizeof(data->getOthers()[0]);
+
+			setupVertexAttribPointer("Bitangent", shader, 3, m_bitangentsOffset, m_bitangentsStride);
+		}
 	}
 
 	if (data->hasIndices()) {
@@ -196,7 +242,7 @@ void MeshRenderData::render() {
 	glBindVertexArray(0);
 }
 
-void MeshRenderData::updateVertices(MeshData* data) {
+void MeshRenderData::updatePositions(MeshData* data) {
 	if (data->hasIndices()) {
 		m_numVertices = data->getIndices().size();
 		m_hasIndices = true;

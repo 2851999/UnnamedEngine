@@ -131,3 +131,14 @@ GLuint Shader::loadShader(std::string data, GLenum type) {
 void Shader::setUniform(std::string name, Matrix4f value) { glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &(value.m_values[0][0])); }
 
 /***************************************************************************************************/
+
+/***************************************************************************************************
+ * The RenderShader class
+ ***************************************************************************************************/
+
+RenderShader::~RenderShader() {
+	for (unsigned int a = 0; a < m_shaders.size(); a++)
+		delete m_shaders.at(a);
+}
+
+/***************************************************************************************************/

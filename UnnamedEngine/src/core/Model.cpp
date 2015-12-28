@@ -37,7 +37,8 @@ void Model::render() {
 }
 
 Model* Model::loadModel(const char* path, const char* fileName, std::string shaderType) {
-	const struct aiScene* scene = aiImportFile((to_string(path) + to_string(fileName)).c_str(), aiProcess_Triangulate | aiProcess_FlipUVs); //aiProcessPreset_TargetRealtime_MaxQuality
+	const struct aiScene* scene = aiImportFile((to_string(path) + to_string(fileName)).c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace); //aiProcessPreset_TargetRealtime_MaxQuality
+	std::map<std::string, Material*> loadedMaterials;
 	if (scene != NULL) {
 		Model* model = new Model();
 		unsigned int numMeshes = scene->mNumMeshes;
@@ -58,33 +59,65 @@ Model* Model::loadModel(const char* path, const char* fileName, std::string shad
 					if (currentMesh->mNormals != NULL) {
 						aiVector3D normal = currentMesh->mNormals[currentFace.mIndices[c]];
 						currentData->addNormal(Vector3f(normal.x, normal.y, normal.z));
+
+						if (currentMesh->mTangents != NULL) {
+							aiVector3D tangent = currentMesh->mTangents[currentFace.mIndices[c]];
+							currentData->addTangent(Vector3f(tangent.x, tangent.y, tangent.z));
+						}
+						if (currentMesh->mBitangents != NULL) {
+							aiVector3D bitangent = currentMesh->mBitangents[currentFace.mIndices[c]];
+							currentData->addBitangent(Vector3f(bitangent.x, bitangent.y, bitangent.z));
+						}
 					}
 				}
 			}
 			Mesh* mesh = new Mesh(currentData, shaderType);
 			if (scene->mMaterials[0] != NULL) {
 				aiMaterial* currentMaterial = scene->mMaterials[currentMesh->mMaterialIndex];
-				Material* material = new Material();
-				if (currentMaterial->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
-					aiString p;
-					currentMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &p, NULL, NULL, NULL, NULL, NULL);
-					material->setDiffuseTexture(Texture::loadTexture((to_string(path) + to_string(p.C_Str())).c_str()));
+				Material* material = NULL;
+				aiString currentMaterialName;
+				currentMaterial->Get(AI_MATKEY_NAME, currentMaterialName);
+
+				if (loadedMaterials.find(currentMaterialName.C_Str()) != loadedMaterials.end())
+					material = loadedMaterials.at(currentMaterialName.C_Str());
+				else {
+					//Load the material
+					material = new Material();
+					loadedMaterials.insert(std::pair<std::string, Material*>(currentMaterialName.C_Str(), material));
+
+					if (currentMaterial->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
+						aiString p;
+						currentMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &p, NULL, NULL, NULL, NULL, NULL);
+						material->setDiffuseTexture(Texture::loadTexture((to_string(path) + to_string(p.C_Str())).c_str()));
+					}
+					if (currentMaterial->GetTextureCount(aiTextureType_SHININESS) != 0) {
+						aiString p;
+						currentMaterial->GetTexture(aiTextureType_SHININESS, 0, &p, NULL, NULL, NULL, NULL, NULL);
+						material->setSpecularTexture(Texture::loadTexture((to_string(path) + to_string(p.C_Str())).c_str()));
+					}
+					if (currentMaterial->GetTextureCount(aiTextureType_HEIGHT) != 0) { //Some reason normal maps are stored here
+						aiString p;
+						currentMaterial->GetTexture(aiTextureType_HEIGHT, 0, &p, NULL, NULL, NULL, NULL, NULL);
+						std::cout << p.C_Str() << std::endl;
+						material->setNormalMap(Texture::loadTexture((to_string(path) + to_string(p.C_Str())).c_str()));
+					}
+					aiColor3D ambientColour = aiColor3D(1.0f, 1.0f, 1.0f);
+					currentMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambientColour);
+					material->setAmbientColour(Colour(ambientColour.r, ambientColour.g, ambientColour.b, 1.0f));
+
+					aiColor3D diffuseColour = aiColor3D(1.0f, 1.0f, 1.0f);
+					currentMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColour);
+					material->setDiffuseColour(Colour(diffuseColour.r, diffuseColour.g, diffuseColour.b, 1.0f));
+
+					aiColor3D specularColour = aiColor3D(1.0f, 1.0f, 1.0f);
+					currentMaterial->Get(AI_MATKEY_COLOR_SPECULAR, specularColour);
+					material->setSpecularColour(Colour(specularColour.r, specularColour.g, specularColour.b, 1.0f));
+
+					float shininess = 0.0f;
+					currentMaterial->Get(AI_MATKEY_SHININESS, shininess);
+					material->setShininess(shininess);
+
 				}
-				aiColor3D ambientColour = aiColor3D(1.0f, 1.0f, 1.0f);
-				currentMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambientColour);
-				material->setAmbientColour(Colour(ambientColour.r, ambientColour.g, ambientColour.b, 1.0f));
-
-				aiColor3D diffuseColour = aiColor3D(1.0f, 1.0f, 1.0f);
-				currentMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColour);
-				material->setDiffuseColour(Colour(diffuseColour.r, diffuseColour.g, diffuseColour.b, 1.0f));
-
-				aiColor3D specularColour = aiColor3D(1.0f, 1.0f, 1.0f);
-				currentMaterial->Get(AI_MATKEY_COLOR_SPECULAR, specularColour);
-				material->setSpecularColour(Colour(specularColour.r, specularColour.g, specularColour.b, 1.0f));
-
-				float shininess = 0.0f;
-				currentMaterial->Get(AI_MATKEY_SHININESS, shininess);
-				material->setShininess(shininess);
 
 				mesh->getRenderData()->setMaterial(material);
 			}

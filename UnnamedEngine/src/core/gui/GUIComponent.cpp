@@ -448,7 +448,7 @@ void GUIFill::update() {
 		if (size.getX() != lastWidth || size.getY() != lastHeight) {
 			renderer->entity->getMesh()->getData()->clearPositions();
 			MeshBuilder::addQuadV(renderer->entity->getMesh()->getData(), Vector2f(0, 0), Vector2f(size.getX(), size.getY()));
-			renderer->entity->getMesh()->updateVertices();
+			renderer->entity->getMesh()->updatePositions();
 			lastWidth = size.getX();
 			lastHeight = size.getY();
 		}
