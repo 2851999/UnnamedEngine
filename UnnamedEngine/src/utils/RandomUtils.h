@@ -16,16 +16,27 @@
  *
  *****************************************************************************/
 
-#include "Settings.h"
+#ifndef UTILS_RANDOMUTILS_H_
+#define UTILS_RANDOMUTILS_H_
 
-/***************************************************************************************************
- * The Settings class
- ***************************************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-const char* Settings::ENGINE_NAME =         "Unnamed Engine";
-const char* Settings::ENGINE_VERSION =      "V0.1.6";
-const char* Settings::ENGINE_VERSION_NAME = "New Language";
-const char* Settings::ENGINE_DATE =         "28/12/2015";
-const char* Settings::ENGINE_BUILD =        "Experimental";
+inline void randomInit() {
+	srand(static_cast <unsigned> (time(0)));
+}
 
-/***************************************************************************************************/
+inline float randomFloat() {
+	return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+}
+
+inline float randomFloat(float min, float max) {
+	return min + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (max - min));
+}
+
+inline float randomFloat(float minmax) {
+	return -minmax + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * minmax));
+}
+
+#endif /* UTILS_RANDOMUTILS_H_ */

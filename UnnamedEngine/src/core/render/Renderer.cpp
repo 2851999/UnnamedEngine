@@ -98,7 +98,7 @@ void Renderer::initialiseShaders() {
 	addShader("DeferredPointLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "DeferredPointLight", "DeferredPointLight"));
 	addShader("DeferredSpotLight", ResourceLoader::loadRenderShader("resources/shaders/lighting/", "DeferredSpotLight", "DeferredSpotLight"));
 
-	addShader("DeferredShader", ResourceLoader::loadRenderShader("resources/shaders/deferred/", "DeferredShader", "DeferredShader"));
+	addShader("GeometryShader", ResourceLoader::loadRenderShader("resources/shaders/deferred/", "GeometryShader", "GeometryShader"));
 }
 
 void Renderer::setupShader(Shader* shader, const char* type) {
@@ -137,6 +137,7 @@ void Renderer::setupShader(Shader* shader, const char* type) {
 		shader->addUniform("EyePosition", "eyePosition");
 
 		if (std::string(type).find("Forward") != std::string::npos) {
+			shader->addUniform("ModelMatrix", "mMatrix");
 			shader->addUniform("NormalMatrix", "nMatrix");
 
 			shader->addAttribute("Position", "position");
@@ -152,6 +153,9 @@ void Renderer::setupShader(Shader* shader, const char* type) {
 			shader->addUniform("ColourBuffer", "buffer_colour");
 			shader->addUniform("NormalBuffer", "buffer_normal");
 			shader->addUniform("ShininessBuffer", "buffer_shininess");
+			shader->addUniform("DepthBuffer", "buffer_depth");
+
+			shader->addUniform("Projection", "projection");
 		}
 
 		shader->addAttribute("TextureCoordinate", "textureCoord");
@@ -163,7 +167,8 @@ void Renderer::setupShader(Shader* shader, const char* type) {
 		} else if (std::string(type).find("SpotLight") != std::string::npos) {
 			SpotLight::addUniforms(shader, "", "spotLight.");
 		}
-	} else if (std::string(type) == "DeferredShader") {
+	} else if (std::string(type) == "GeometryShader") {
+		shader->addUniform("ModelMatrix", "mMatrix");
 		shader->addUniform("NormalMatrix", "nMatrix");
 		shader->addUniform("ModelViewProjectionMatrix", "mvpMatrix");
 
@@ -274,14 +279,17 @@ void DeferredRenderer::renderToScreen(bool bindBuffers, bool unbindBuffers) {
 			GLuint b2 = 0;
 			GLuint b3 = 0;
 			GLuint b4 = 0;
+			GLuint b5 = 0;
 
 			if (bindBuffers) {
 				b1 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_WORLD_POSITION));
 				b2 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_COLOUR));
 				b3 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_NORMAL));
 				b4 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_SHININESS));
+				b5 = Renderer::bindTexture(m_geometryBuffer->getTexture(GeometryBuffer::BUFFER_DEPTH));
 			} else {
-				b4 = Renderer::getNumBoundTextures() - 1;
+				b5 = Renderer::getNumBoundTextures() - 1;
+				b4 = b5 - 1;
 				b3 = b4 - 1;
 				b2 = b3 - 1;
 				b1 = b2 - 1;
@@ -291,6 +299,9 @@ void DeferredRenderer::renderToScreen(bool bindBuffers, bool unbindBuffers) {
 			glUniform1i(currentShader->getUniformLocation("ColourBuffer"), b2);
 			glUniform1i(currentShader->getUniformLocation("NormalBuffer"), b3);
 			glUniform1i(currentShader->getUniformLocation("ShininessBuffer"), b4);
+			glUniform1i(currentShader->getUniformLocation("DepthBuffer"), b5);
+
+			glUniformMatrix4fv(currentShader->getUniformLocation("Projection"), 1, GL_FALSE, &(Renderer::getCamera()->getProjectionMatrix().m_values[0][0]));
 
 			glUniformMatrix4fv(currentShader->getUniformLocation("ModelViewProjectionMatrix"), 1, GL_FALSE, &(mvp.m_values[0][0]));
 			m_screenQuad->getMesh()->render();

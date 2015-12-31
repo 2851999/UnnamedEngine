@@ -93,7 +93,7 @@ Model* Model::loadModel(const char* path, const char* fileName, std::string shad
 					if (currentMaterial->GetTextureCount(aiTextureType_SHININESS) != 0) {
 						aiString p;
 						currentMaterial->GetTexture(aiTextureType_SHININESS, 0, &p, NULL, NULL, NULL, NULL, NULL);
-						material->setSpecularTexture(Texture::loadTexture((to_string(path) + to_string(p.C_Str())).c_str()));
+						material->setShininessTexture(Texture::loadTexture((to_string(path) + to_string(p.C_Str())).c_str()));
 					}
 					if (currentMaterial->GetTextureCount(aiTextureType_HEIGHT) != 0) { //Some reason normal maps are stored here
 						aiString p;

@@ -28,10 +28,10 @@ void Material::addUniforms(Shader* shader) {
 	shader->addUniform("Material_DiffuseColour", "material.diffuseColour");
 	shader->addUniform("Material_SpecularColour", "material.specularColour");
 	shader->addUniform("Material_DiffuseTexture", "material.diffuseTexture");
-	shader->addUniform("Material_SpecularTexture", "material.specularTexture");
+	shader->addUniform("Material_ShininessTexture", "material.shininessTexture");
 	shader->addUniform("Material_NormalMap", "material.normalMap");
 	shader->addUniform("Material_Shininess", "material.shininess");
-	shader->addUniform("Material_UseSpecularTexture", "material.useSpecularTexture");
+	shader->addUniform("Material_UseShininessTexture", "material.useShininessTexture");
 	shader->addUniform("Material_UseNormalMap", "material.useNormalMap");
 }
 
@@ -45,13 +45,13 @@ void Material::setUniforms(Shader* shader) {
 	else
 		shader->setUniform("Material_DiffuseTexture", Renderer::bindTexture(m_diffuseTexture));
 
-	if (m_specularTexture != NULL) {
-		shader->setUniform("Material_SpecularTexture", Renderer::bindTexture(m_specularTexture));
-		shader->setUniform("Material_UseSpecularTexture", 1.0f);
+	if (m_shininessTexture != NULL && m_useShininessTexture) {
+		shader->setUniform("Material_ShininessTexture", Renderer::bindTexture(m_shininessTexture));
+		shader->setUniform("Material_UseShininessTexture", 1.0f);
 	} else
-		shader->setUniform("Material_UseSpecularTexture", 0.0f);
+		shader->setUniform("Material_UseShininessTexture", 0.0f);
 
-	if (m_normalMap != NULL) {
+	if (m_normalMap != NULL && m_useNormalMap) {
 		shader->setUniform("Material_NormalMap", Renderer::bindTexture(m_normalMap));
 		shader->setUniform("Material_UseNormalMap", 1.0f);
 	} else

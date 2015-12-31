@@ -39,10 +39,10 @@ SkyBox::SkyBox(std::string path, std::string front, std::string back, std::strin
 
 void SkyBox::update(Vector3f cameraPosition) {
 	m_box.setPosition(cameraPosition * -1);
+	m_box.update();
 }
 
 void SkyBox::render() {
-	m_box.update();
 	glDepthMask(false);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	Renderer::render(m_box.getMesh(), m_box.getModelMatrix(), "SkyBox");

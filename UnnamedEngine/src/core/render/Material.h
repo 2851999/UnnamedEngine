@@ -33,27 +33,33 @@ private:
 	Colour m_diffuseColour = Colour::WHITE;
 	Colour m_specularColour = Colour::WHITE;
 	Texture* m_diffuseTexture;
-	Texture* m_specularTexture;
+	Texture* m_shininessTexture;
 	Texture* m_normalMap;
+	bool m_useShininessTexture = true;
+	bool m_useNormalMap = true;
 	float m_shininess = 0.0;
 public:
-	Material() { m_diffuseTexture = NULL; m_specularTexture = NULL; m_normalMap = NULL; }
+	Material() { m_diffuseTexture = NULL; m_shininessTexture = NULL; m_normalMap = NULL; }
 	inline void setAmbientColour(Colour colour) { m_ambientColour = colour; }
 	inline void setDiffuseColour(Colour colour) { m_diffuseColour = colour; }
 	inline void setSpecularColour(Colour colour) { m_specularColour = colour; }
 	inline void setDiffuseTexture(Texture* texture) { m_diffuseTexture = texture; }
-	inline void setSpecularTexture(Texture* texture) { m_specularTexture = texture; }
+	inline void setShininessTexture(Texture* texture) { m_shininessTexture = texture; }
 	inline void setNormalMap(Texture* texture) { m_normalMap = texture; }
 	inline void setShininess(float shininess) { m_shininess = shininess; }
+	inline void setUseShininessTexture(bool useShininessTexture) { m_useShininessTexture = useShininessTexture; }
+	inline void setUseNormalMap(bool useNormalMap) { m_useNormalMap = useNormalMap; }
 	inline Colour getAmbientColour() { return m_ambientColour; }
 	inline Colour getDiffuseColour() { return m_diffuseColour; }
 	inline Colour getSpecularColour() { return m_specularColour; }
 	inline Texture* getDiffuseTexture() { return m_diffuseTexture; }
-	inline Texture* getSpecularTexture() { return m_specularTexture; }
+	inline Texture* getShininessTexture() { return m_shininessTexture; }
 	inline Texture* getNormalMap() { return m_normalMap; }
 	inline bool hasDiffuseTexture() { return m_diffuseTexture != NULL; }
-	inline bool hasSpecularTexture() { return m_specularTexture != NULL; }
+	inline bool hasShininessTexture() { return m_shininessTexture != NULL; }
 	inline bool hasNormalMap() { return m_normalMap != NULL; }
+	inline bool shouldUseShininessTexture() { return m_useShininessTexture; }
+	inline bool shouldUseNormalMap() { return m_useNormalMap; }
 	inline float getShininess() { return m_shininess; }
 
 	void setUniforms(Shader* shader);

@@ -75,6 +75,7 @@ public:
 	inline void setRotation(float rotation) { this->rotation = rotation; }
 	inline void setScale(Vector2f scale) { this->scale = scale; }
 	inline void setScale(float x, float y) { scale = Vector2f(x, y); }
+	inline void setScale(float value) { scale = Vector2f(value, value); }
 	inline void setSize(Vector2f size) { this->size = size; }
 	inline void setSize(float width, float height) { size = Vector2f(width, height); }
 	inline void setWidth(float width) { size.setX(width); }
@@ -150,6 +151,7 @@ public:
 	inline void setRotation(float x, float y, float z) { rotation = Vector3f(x, y, z); }
 	inline void setScale(Vector3f scale) { this->scale = scale; }
 	inline void setScale(float x, float y, float z) { scale = Vector3f(x, y, z); }
+	inline void setScale(float value) { scale = Vector3f(value, value, value); }
 	inline void setSize(Vector3f size) { this->size = size; }
 	inline void setSize(float width, float height, float depth) { size = Vector3f(width, height, depth); }
 	inline void setWidth(float width) { size.setX(width); }

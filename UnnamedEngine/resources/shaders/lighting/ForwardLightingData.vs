@@ -1,6 +1,7 @@
 #version 140
 
-uniform mat4 nMatrix;
+uniform mat4 mMatrix;
+uniform mat3 nMatrix;
 uniform mat4 mvpMatrix;
 
 in vec3 position;
@@ -19,8 +20,8 @@ out mat3 frag_tbnMatrix;
 void main() {
 	frag_vertex = vec3(mvpMatrix * vec4(position, 1.0));
 	frag_textureCoord = textureCoord;
-	frag_normal = normalize(vec4(normal, 0.0) * nMatrix).xyz;
-	frag_worldPosition = position; //Done for point lights which rely on this being in the same space as the light position
+	frag_normal = normalize(normal * nMatrix).xyz;
+	frag_worldPosition = (vec4(position, 1.0) * mMatrix).xyz; //Done for point lights which rely on this being in the same space as the light position
 	
 	gl_Position = mvpMatrix * vec4(position, 1.0);
 	

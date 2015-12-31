@@ -54,6 +54,11 @@ public:
 	inline void setAmbientLight(Colour ambientLight) { m_ambientLight = ambientLight; }
 	inline void setSpecularIntensity(float specularIntensity) { m_specularIntensity = specularIntensity; }
 
+	inline unsigned int getNumObjects() { return m_objects.size(); }
+	inline unsigned int getNumLights() { return m_lights.size(); }
+	inline RenderableObject3D* getObject(unsigned int n) { return m_objects.at(n); }
+	inline LightSource* getLight(unsigned int n) { return m_lights.at(n); }
+
 	inline bool isLightingEnabled() { return m_lightingEnabled; }
 	inline Colour getAmbientLight() { return m_ambientLight; }
 	inline float getSpecularIntensity() { return m_specularIntensity; }

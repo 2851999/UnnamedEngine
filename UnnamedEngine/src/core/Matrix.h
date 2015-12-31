@@ -89,6 +89,76 @@ public:
 };
 
 template<typename T>
+class Matrix3 : public Matrix<T, 3> {
+
+};
+
+class Matrix3f : public Matrix3<float> {
+public:
+	inline Matrix3f operator*(Matrix3f matrix) {
+		Matrix3f result;
+		//Column (2st)
+		for (unsigned int a = 0; a < 3; a++) {
+			//Row (1nd)
+			for (unsigned int b = 0; b < 3; b++) {
+				result.m_values[a][b] = 0;
+				//Column (1st) / Row (2nd)
+				for (unsigned int c = 0; c < 3; c++) {
+					result.m_values[a][b] += m_values[a][c] * matrix.m_values[c][b];
+				}
+			}
+		}
+		return result;
+	}
+
+	inline Matrix3f transpose() {
+		Matrix3f result;
+		for (unsigned int x = 0; x < 3; x++)
+			for (unsigned int y = 0; y < 3; y++)
+				result[x][y] = m_values[y][x];
+		return result;
+	}
+
+	inline Matrix3f inverse() {
+		Matrix3f result;
+
+		float a = m_values[0][0];
+		float b = m_values[0][1];
+		float c = m_values[0][2];
+		float d = m_values[1][0];
+		float e = m_values[1][1];
+		float f = m_values[1][2];
+		float g = m_values[2][0];
+		float h = m_values[2][1];
+		float i = m_values[2][2];
+
+		float A = (e * i - f * h);
+		float B = -(d * i - f * g);
+		float C = (d * h - e * g);
+		float D = -(b * i - c * h);
+		float E = (a * i - c * g);
+		float F = -(a * h - b * g);
+		float G = (b * f - c * e);
+		float H = -(a * f - c * d);
+		float I = (a * e - b * d);
+
+		float invdet = 1.0f / ((a * A) + (b * B) + (c * C));
+
+		result.set(0, 0, invdet * A);
+		result.set(0, 1, invdet * D);
+		result.set(0, 2, invdet * G);
+		result.set(1, 0, invdet * B);
+		result.set(1, 1, invdet * E);
+		result.set(1, 2, invdet * H);
+		result.set(2, 0, invdet * C);
+		result.set(2, 1, invdet * F);
+		result.set(2, 2, invdet * I);
+
+		return result;
+	}
+};
+
+template<typename T>
 class Matrix4 : public Matrix<T, 4> {
 
 };
@@ -368,6 +438,22 @@ public:
 		translate(t);
 	}
 
+	inline Matrix3f to3x3() {
+		Matrix3f mat3;
+		mat3.set(0, 0, get(0, 0));
+		mat3.set(1, 0, get(1, 0));
+		mat3.set(2, 0, get(2, 0));
+
+		mat3.set(0, 1, get(0, 1));
+		mat3.set(1, 1, get(1, 1));
+		mat3.set(2, 1, get(2, 1));
+
+		mat3.set(0, 2, get(0, 2));
+		mat3.set(1, 2, get(1, 2));
+		mat3.set(2, 2, get(2, 2));
+		return mat3;
+	}
+
 	/* The method used to invert this matrix */
 	Matrix4f inverse() {
 		//Get the values of the matrix (Transposed)
@@ -478,7 +564,6 @@ typedef Matrix<int, 3> Matrix3i;
 typedef Matrix4<int> Matrix4i;
 
 typedef Matrix<float, 2> Matrix2f;
-typedef Matrix<float, 3> Matrix3f;
 
 typedef Matrix<double, 2> Matrix2d;
 typedef Matrix<double, 3> Matrix3d;

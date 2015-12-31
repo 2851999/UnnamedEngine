@@ -19,6 +19,8 @@
 #include "core/CoreEngine.h"
 #include "core/gui/Font.h"
 
+#include "utils/RandomUtils.h"
+
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -28,14 +30,14 @@ class LightingTest : public Game {
 private:
 	Model* model2;
 	Model* model;
-	Shader* shader;
-	Camera3D* camera;
+	DebugCamera3D* camera;
 	Scene* scene;
 	DirectionalLight* directionalLight;
 	PointLight* pointLight;
 	SpotLight* spotLight;
 	bool wireframe;
-//	GUIButton* button;
+
+	std::vector<PointLight*> pointLights;
 public:
 	virtual ~LightingTest() {}
 	virtual void initialise(Settings* settings);
@@ -50,7 +52,7 @@ public:
 	void onMousePressed(int button) {}
 	void onMouseReleased(int button) {}
 	void onMouseClicked(int button) {}
-	void onMouseMoved(double x, double y, double dx, double dy);
+	void onMouseMoved(double x, double y, double dx, double dy) {}
 	void onMouseDragged(double x, double y, double dx, double dy) {}
 	void onMouseEnter() {}
 	void onMouseLeave() {}
@@ -66,86 +68,90 @@ void LightingTest::initialise(Settings* settings) {
 }
 
 void LightingTest::created() {
-	camera = new Camera3D(Matrix4f().initPerspective(80, ((float) getSettings()->getWindowWidth()) / ((float) getSettings()->getWindowHeight()), 1, 100));
+	camera = new DebugCamera3D(80, getSettings()->getWindowWidth(), getSettings()->getWindowHeight(), 1, 100);
 	camera->setPosition(0, 0, -1);
-	camera->update();
 	camera->toggleFlying();
 
 	TextureParameters::DEFAULT_FILTER = GL_LINEAR_MIPMAP_LINEAR;
 
-	SkyBox* skybox = new SkyBox("C:/UnnamedEngine/", "skybox0.png", "skybox1.png", "skybox2.png", "skybox3.png", "skybox4.png", "skybox5.png", 100);
+	SkyBox* skybox = new SkyBox("C:/UnnamedEngine/skybox", "0.png", "1.png", "2.png", "3.png", "4.png", "5.png", 100);
 
 	camera->setSkyBox(skybox);
 	Renderer::addCamera(camera);
-//	model = Model::loadModel("C:/UnnamedEngine/Models/mitsuba/", "mitsuba-sphere-blue.obj", "SpotLight");
-//	model->position.setY(-1);
-	model = Model::loadModel("C:/UnnamedEngine/Models/head/", "head.obj", "DeferredShader");
-//	model = Model::loadModel("C:/UnnamedEngine/Models/", "buddha.obj", "SpotLight");
-	//model = Model::loadModel("C:/UnnamedEngine/Models/crytek-sponza/", "sponza.obj", "DeferredShader");
+	//model = Model::loadModel("C:/UnnamedEngine/Models/mitsuba/", "mitsuba-sphere-blue.obj", "GeometryShader");
+	//model = Model::loadModel("C:/UnnamedEngine/Models/mitsuba/", "mitsuba.obj", "GeometryShader");
+	//model->position.setY(-1);
+	//model = Model::loadModel("C:/UnnamedEngine/Models/head/", "head.obj", "GeometryShader");
+	//model = Model::loadModel("C:/UnnamedEngine/Models/", "buddha.obj", "GeometryShader");
+	model = Model::loadModel("C:/UnnamedEngine/Models/plane/", "plane.obj", "GeometryShader");
+	//model = Model::loadModel("C:/UnnamedEngine/Models/crytek-sponza/", "sponza.obj", "GeometryShader");
 	//model->setScale(0.1f, 0.1f, 0.1f);
-//	model->getMesh(0)->getRenderData()->getMaterial()->setShininess(10.0f);
-	model->update();
+	model->setPosition(0.0f, -2.5f, 0.0f);
+	//model->getMesh(0)->getRenderData()->getMaterial()->setShininess(10.0f);
+	//model = Model::loadModel("C:/UnnamedEngine/Models/plane/", "plane.obj", "GeometryShader");
+	model2 = Model::loadModel("C:/UnnamedEngine/Models/plane/", "plane2.obj", "GeometryShader");
+	//model2 = Model::loadModel("C:/UnnamedEngine/Models/Audi_R8/", "Audi_R8.obj", "GeometryShader");
+	model2->setPosition(5.0f, -1.0f, 0.0f);
 
 	scene = new Scene();
 	scene->add(model);
+	scene->add(model2);
 	scene->setLightingEnabled(true);
 
 	if (! scene->isLightingEnabled()) {
 		model->setShaderType("Material");
 	}
 
-	directionalLight = new DirectionalLight(new BaseLight(Colour::WHITE, 1.0f), Vector3f(0.0, 0.0, 1.0));
+	directionalLight = new DirectionalLight(new BaseLight(Colour::WHITE, 1.0f), Vector3f(0.0, 1.0, -0.3));
+	pointLight = new PointLight(new BaseLight(Colour::GREEN, 1.0f), Vector3f(-2.0, 0.2, 0.0), 10.0f);
+	spotLight = new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.5), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f);
 
-	pointLight = new PointLight(new BaseLight(Colour::GREEN, 1.0f), Vector3f(-1.5, 0.0, 0.0), 10.0f);
-
-	spotLight = new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f);
-
-	scene->add(directionalLight);
-	scene->add(pointLight);
-	scene->add(spotLight);
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
-//	scene->add(new SpotLight(new PointLight(new BaseLight(Colour::BLUE, 1.0f), Vector3f(0.0, 0.0, 1.0), 10.0f), Vector3f(0.0, 0.0, -1.0), 0.95f));
+	//scene->add(directionalLight);
+	//scene->add(pointLight);
+	//scene->add(spotLight);
 
 	//12 - 214
+	randomInit();
+	for (unsigned int a = 0; a < 120; a++) {
+		float x = randomFloat(14.0f);
+		float y = randomFloat(5.0f);
+		float z = randomFloat(5.0f);
+
+		PointLight* light = new PointLight(new BaseLight(Colour(randomFloat(), randomFloat(), randomFloat(), 1.0), 1.0f), Attenuation(0.1, 0.1, 0.5), Vector3f(x, y, z), 10.0f);
+
+		scene->add(light);
+		pointLights.push_back(light);
+	}
 
 	Mouse::lock();
 }
 
 void LightingTest::update() {
-	if (getWindow()->getKey(GLFW_KEY_W)) {
-		camera->moveForward(0.08f);
-		camera->update();
-	} else if (getWindow()->getKey(GLFW_KEY_S)) {
-		camera->moveBackward(0.08f);
-		camera->update();
-	}
-	if (getWindow()->getKey(GLFW_KEY_A)) {
-		camera->moveLeft(0.08f);
-		camera->update();
-	} else if (getWindow()->getKey(GLFW_KEY_D)) {
-		camera->moveRight(0.08f);
-		camera->update();
-	}
+	camera->update(getDelta());
 
 	if (getWindow()->getKey(GLFW_KEY_RIGHT)) {
 		//model->rotation.setY(model->rotation.getY() + 0.05 * getDelta());
 		//pointLight->setPosition(pointLight->getPosition() + Vector3f(0.002 * getDelta(), 0.0, 0.0));
-		spotLight->getPointLight()->setPosition(spotLight->getPointLight()->getPosition() + Vector3f(0.001 * getDelta(), 0.0, 0.0));
+		//spotLight->getPointLight()->setPosition(spotLight->getPointLight()->getPosition() + Vector3f(0.001 * getDelta(), 0.0, 0.0));
+		model2->position.setX(model2->position.getX() + 0.01 * getDelta());
 	} else if (getWindow()->getKey(GLFW_KEY_LEFT)) {
 		//pointLight->setPosition(pointLight->getPosition() + Vector3f(-0.002 * getDelta(), 0.0, 0.0));
-		spotLight->getPointLight()->setPosition(spotLight->getPointLight()->getPosition() + Vector3f(-0.001 * getDelta(), 0.0, 0.0));
+		//spotLight->getPointLight()->setPosition(spotLight->getPointLight()->getPosition() + Vector3f(-0.001 * getDelta(), 0.0, 0.0));
+		model2->position.setX(model2->position.getX() - 0.01 * getDelta());
 	}
 
-	//model->rotation.setY(model->rotation.getY() + 0.05 * getDelta());
+	if (getWindow()->getKey(GLFW_KEY_R))
+		model2->rotation.setY(model2->rotation.getY() + 0.05 * getDelta());
+
+	for (unsigned int a = 0; a < pointLights.size(); a++) {
+		if (getWindow()->getKey(GLFW_KEY_PAGE_UP))
+			pointLights.at(a)->setPosition(Vector3f(pointLights.at(a)->getPosition().getX(), pointLights.at(a)->getPosition().getY() + 0.0005f * getDelta(), pointLights.at(a)->getPosition().getZ()));
+		if (getWindow()->getKey(GLFW_KEY_PAGE_DOWN))
+			pointLights.at(a)->setPosition(Vector3f(pointLights.at(a)->getPosition().getX(), pointLights.at(a)->getPosition().getY() - 0.0005f * getDelta(), pointLights.at(a)->getPosition().getZ()));
+	}
+
 	model->update();
+	model2->update();
 }
 
 void LightingTest::render() {
@@ -160,35 +166,10 @@ void LightingTest::render() {
 	if (wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	if (getSettings()->getVideoDeferredRendering()) {
-		Renderer::setShader(Renderer::getShader("DeferredShader"));
-		DeferredRenderer::start();
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_TEXTURE_2D);
-
-		scene->render(camera->position);
-
-		DeferredRenderer::stop();
-		Renderer::resetShader();
-	} else {
-		scene->render(camera->position);
-	}
+	scene->render(camera->position);
 
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
-
-//	Renderer::setShader(Renderer::getShader("DirectionalLight"));
-//	Shader* shader = Renderer::getShader("");
-//	shader->use();
-//	shader->setUniform("ModelMatrix", model->getModelMatrix());
-//	shader->setUniform("AmbientLight", Colour(0.1f, 0.1f, 0.1f, 1.0f));
-//	shader->setUniform("SpecularIntensity", 0.2f);
-//	shader->setUniform("EyePosition", camera->getPosition());
-//	directionalLight->setUniforms(shader, "");
-//	scene->render();
-//
-//	Renderer::resetShader();
 
 	if (wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -201,12 +182,6 @@ void LightingTest::render() {
 
 void LightingTest::destroy() {
 	//delete &shader;
-}
-
-void LightingTest::onMouseMoved(double x, double y, double dx, double dy) {
-	camera->setRotation(camera->getRotation() + Vector3f(dy / 5, dx / 5, 0));
-	camera->rotation.setX(clamp(camera->rotation.getX(), -80, 80));
-	camera->update();
 }
 
 void LightingTest::onKeyPressed(int key) {

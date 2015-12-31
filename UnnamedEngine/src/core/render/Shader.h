@@ -31,6 +31,7 @@
 #include "../../utils/StringUtils.h"
 #include "../../utils/Logging.h"
 
+class Matrix3f;
 class Matrix4f;
 
 /***************************************************************************************************
@@ -78,6 +79,7 @@ public:
 	inline void setUniform(std::string name, GLuint value) { glUniform1i(getUniformLocation(name), value); }
 	inline void setUniform(std::string name, float value) { glUniform1f(getUniformLocation(name), value); }
 	inline void setUniform(std::string name, Colour value) { glUniform4f(getUniformLocation(name), value.getR(), value.getG(), value.getB(), value.getA()); }
+	void setUniform(std::string name, Matrix3f value);
 	void setUniform(std::string name, Matrix4f value);
 	inline void setUniform(std::string name, Vector3f value) { glUniform3f(getUniformLocation(name), value.getX(), value.getY(), value.getZ()); }
 

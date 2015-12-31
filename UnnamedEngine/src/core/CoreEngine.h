@@ -50,6 +50,7 @@
 #include "Texture.h"
 #include "Object.h"
 #include "Camera.h"
+#include "game/DebugCamera.h"
 #include "Skybox.h"
 #include "Model.h"
 #include "Game.h"

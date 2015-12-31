@@ -1,5 +1,14 @@
 --------------------------------------------------------------
-Release 0 | Beta 0 | Development 0 | Experimental 4 (V0.1.5)
+Release 0 | Beta 0 | Development 0 | Experimental 6 (V0.1.6)
+
+* Added DebugCamera3D
+* Added RandomUtils.h
+
+* Fixed bug: Light positions were relative to the model and
+			 therefore followed their position
+
+--------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 5 (V0.1.5)
 
 * Added normal mapping
 

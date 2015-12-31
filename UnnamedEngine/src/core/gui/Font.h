@@ -43,8 +43,8 @@ public:
 		m_fontSize = fontSize;
 		m_gridWidth = gridSize;
 		m_gridHeight = gridSize;
-		m_cellWidth = texture->getWidth() / m_gridWidth;
-		m_cellHeight = texture->getHeight() / m_gridHeight;
+		m_cellWidth = (float) texture->getWidth() / (float) m_gridWidth;
+		m_cellHeight = (float) texture->getHeight() / (float) m_gridHeight;
 		m_fontSize = fontSize;
 		m_colour = colour;
 		getMesh()->setTexture(texture);
@@ -54,7 +54,7 @@ public:
 	void update(std::string text);
 
 	inline float getWidth(std::string text) {
-		return (text.length() * (((m_cellWidth / m_cellHeight) * m_fontSize) / 1.4f));
+		return (text.length() * (((m_cellWidth / m_cellHeight) * m_fontSize) / 1.5f));
 	}
 	inline float getHeight(std::string text) {
 		return m_fontSize;

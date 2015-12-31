@@ -128,6 +128,7 @@ GLuint Shader::loadShader(std::string data, GLenum type) {
 	return shader;
 }
 
+void Shader::setUniform(std::string name, Matrix3f value) { glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, &(value.m_values[0][0])); }
 void Shader::setUniform(std::string name, Matrix4f value) { glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &(value.m_values[0][0])); }
 
 /***************************************************************************************************/
