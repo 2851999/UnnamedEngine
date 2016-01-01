@@ -65,6 +65,10 @@ private:
 	Vector2i    m_video_resolution;
 	bool		m_video_deferred_rendering;
 
+	/* The values that correspond to specific 'audio' settings */
+	unsigned int m_audio_volume_sound_effect;
+	unsigned int m_audio_volume_music;
+
 	/* The values that correspond to specific 'input' settings */
 	bool        m_input_mouse_events_repeat;
 	bool        m_input_keyboard_events_repeat;
@@ -100,6 +104,9 @@ public:
 		m_video_resolution   = VIDEO_RESOLUTION_DEFAULT;
 		m_video_deferred_rendering = false;
 
+		m_audio_volume_sound_effect = 100;
+		m_audio_volume_music = 100;
+
 		m_input_mouse_events_repeat = false;
 		m_input_keyboard_events_repeat = true;
 
@@ -127,6 +134,9 @@ public:
 	inline void setVideoResolution(Vector2i videoResolution)             { m_video_resolution              = videoResolution;       }
 	inline void setVideoDeferredRendering(bool videoDeferredRendering)   { m_video_deferred_rendering      = videoDeferredRendering; }
 
+	inline void setAudioSoundEffectVolume(unsigned int soundEffectVolume) { m_audio_volume_sound_effect = soundEffectVolume; }
+	inline void setAudioMusicVolume(unsigned int musicVolume) { m_audio_volume_music = musicVolume; }
+
 	inline void setMouseEventsRepeat(bool mouseEventsRepeat)             { m_input_mouse_events_repeat = mouseEventsRepeat; }
 	inline void setKeyboardEventsRepeat(bool keyboardEventsRepeat)             { m_input_keyboard_events_repeat = keyboardEventsRepeat; }
 
@@ -148,6 +158,9 @@ public:
 	inline int         getVideoMaxAnisotropicSamples()     { return m_video_max_anisotropic_samples; }
 	inline Vector2i    getVideoResolution()                { return m_video_resolution;        }
 	inline bool		   getVideoDeferredRendering()         { return m_video_deferred_rendering; }
+
+	inline unsigned int getAudioSoundEffectVolume() { return m_audio_volume_sound_effect; }
+	inline unsigned int getAudioMusicVolume() { return m_audio_volume_music; }
 
 	inline bool        getMouseEventsRepeat()              { return m_input_mouse_events_repeat; }
 	inline bool        getKeyboardEventsRepeat()              { return m_input_keyboard_events_repeat; }

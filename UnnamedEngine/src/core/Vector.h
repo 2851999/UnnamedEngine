@@ -300,6 +300,7 @@ public:
 class Vector3f : public Vector3<float> {
 public:
 	Vector3f(float x = 0, float y = 0, float z = 0) : Vector3(x, y, z) {}
+	Vector3f(Vector2f vector, float z = 0) : Vector3(vector.getX(), vector.getY(), z) {}
 	Vector3f operator+(float value) {
 		Vector3f result;
 		result[0] = (*this)[0] + value;

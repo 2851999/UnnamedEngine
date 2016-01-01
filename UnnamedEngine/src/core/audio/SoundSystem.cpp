@@ -16,16 +16,46 @@
  *
  *****************************************************************************/
 
-#include "Settings.h"
+#include <algorithm>
+#include "SoundSystem.h"
 
 /***************************************************************************************************
- * The Settings class
+ * The SoundSystem class
  ***************************************************************************************************/
 
-const char* Settings::ENGINE_NAME =         "Unnamed Engine";
-const char* Settings::ENGINE_VERSION =      "V0.1.8";
-const char* Settings::ENGINE_VERSION_NAME = "New Language";
-const char* Settings::ENGINE_DATE =         "01/01/2016";
-const char* Settings::ENGINE_BUILD =        "Experimental";
+void SoundSystem::play(std::string key) {
+	AudioSource* source = getSource(key);
+	source->play();
+	m_playing.push_back(source);
+}
+
+void SoundSystem::pause(std::string key) {
+	getSource(key)->pause();
+}
+
+void SoundSystem::resume(std::string key) {
+	getSource(key)->resume();
+}
+
+void SoundSystem::stop(std::string key) {
+	AudioSource* source = getSource(key);
+	source->stop();
+	m_playing.erase(std::remove(m_playing.begin(), m_playing.end(), source));
+}
+
+void SoundSystem::update() {
+	//Update the listener
+	if (m_listener != NULL)
+		m_listener->update();
+	//Go through the sources
+	for (unsigned int a = 0; a < m_playing.size(); a++) {
+		//Check to see whether the source is still playing
+		if (m_playing.at(a)->isPlaying())
+			//Update the source
+			m_playing.at(a)->update();
+		else
+			m_playing.erase(m_playing.begin() + a);
+	}
+}
 
 /***************************************************************************************************/

@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "../../Vector.h"
+#include "../../Object.h"
 #include "../Shader.h"
 
 /***************************************************************************************************
@@ -49,8 +50,10 @@ public:
  * The LightSource class is inherited by all light sources
  ***************************************************************************************************/
 
-class LightSource {
+class LightSource : public Object3D {
 public:
+	LightSource() {}
+	LightSource(Vector3f position) : Object3D(position) {}
 	virtual ~LightSource() {}
 
 	virtual void apply() {}
@@ -127,34 +130,31 @@ class PointLight : public LightSource {
 private:
 	BaseLight*   m_baseLight;
 	Attenuation  m_attenuation;
-	Vector3f     m_position;
 	float        m_range = 4.0f;
 public:
 	PointLight() { m_baseLight = new BaseLight(); }
-	PointLight(Vector3f position) : m_position(position) { m_baseLight = new BaseLight(); }
-	PointLight(Attenuation attenuation, Vector3f position) : m_attenuation(attenuation), m_position(position) { m_baseLight = new BaseLight(); }
-	PointLight(Vector3f position, float range) : m_position(position), m_range(range) { m_baseLight = new BaseLight(); }
-	PointLight(Attenuation attenuation, Vector3f position, float range) : m_attenuation(attenuation), m_position(position), m_range(range) { m_baseLight = new BaseLight(); }
+	PointLight(Vector3f position) : LightSource(position) { m_baseLight = new BaseLight(); }
+	PointLight(Attenuation attenuation, Vector3f position) : LightSource(position), m_attenuation(attenuation) { m_baseLight = new BaseLight(); }
+	PointLight(Vector3f position, float range) : LightSource(position), m_range(range) { m_baseLight = new BaseLight(); }
+	PointLight(Attenuation attenuation, Vector3f position, float range) : m_attenuation(attenuation), m_range(range) { m_baseLight = new BaseLight(); }
 
 	PointLight(BaseLight* baseLight) : m_baseLight(baseLight) {}
-	PointLight(BaseLight* baseLight, Vector3f position) : m_baseLight(baseLight), m_position(position) {}
-	PointLight(BaseLight* baseLight, Attenuation attenuation, Vector3f position) :
-		m_baseLight(baseLight), m_attenuation(attenuation), m_position(position) {}
-	PointLight(BaseLight* baseLight, Vector3f position, float range) : m_baseLight(baseLight), m_position(position), m_range(range) {}
-	PointLight(BaseLight* baseLight, Attenuation attenuation, Vector3f position, float range) :
-		m_baseLight(baseLight), m_attenuation(attenuation), m_position(position), m_range(range) {}
+	PointLight(BaseLight* baseLight, Vector3f position) : LightSource(position), m_baseLight(baseLight) {}
+	PointLight(BaseLight* baseLight, Attenuation attenuation, Vector3f position) : LightSource(position),
+		m_baseLight(baseLight), m_attenuation(attenuation) {}
+	PointLight(BaseLight* baseLight, Vector3f position, float range)  : LightSource(position), m_baseLight(baseLight), m_range(range) {}
+	PointLight(BaseLight* baseLight, Attenuation attenuation, Vector3f position, float range) : LightSource(position),
+		m_baseLight(baseLight), m_attenuation(attenuation), m_range(range) {}
 
 	~PointLight() {}
 
 	/* The setters and getters */
 	inline void setBaseLight(BaseLight* baseLight) { m_baseLight = baseLight; }
 	inline void setAttenuation(Attenuation attenuation) { m_attenuation = attenuation; }
-	inline void setPosition(Vector3f position) { m_position = position; }
 	inline void setRange(float range) { m_range = range; }
 
 	inline BaseLight* getBaseLight() { return m_baseLight; }
 	inline Attenuation getAttenuation() { return m_attenuation; }
-	inline Vector3f getPosition() { return m_position; }
 	inline float getRange() { return m_range; }
 
 	void setUniforms(Shader* shader, std::string prefix);

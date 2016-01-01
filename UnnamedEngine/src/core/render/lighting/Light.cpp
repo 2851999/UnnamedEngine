@@ -91,7 +91,7 @@ void PointLight::addUniforms(Shader* shader, std::string prefix, std::string loc
 }
 
 void PointLight::setUniforms(Shader* shader, std::string prefix) {
-	shader->setUniform(prefix + "PointLight_Position", m_position);
+	shader->setUniform(prefix + "PointLight_Position", getPosition());
 	shader->setUniform(prefix + "PointLight_Range", m_range);
 
 	m_baseLight->setUniforms(shader, prefix + "PointLight_");

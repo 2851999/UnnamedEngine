@@ -1,4 +1,17 @@
 --------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 8 (V0.1.8)
+
+* Added AudioObject
+* Added AudioData
+* Added AudioLoader
+* Added AudioSource
+* Added AudioListener
+* Added AudioManager
+* Added SoundSystem
+
+* LightSource now inherits from Object3D
+
+--------------------------------------------------------------
 Release 0 | Beta 0 | Development 0 | Experimental 7 (V0.1.7)
 
 * Added GUISlider

@@ -21,6 +21,8 @@
 
 #include "utils/RandomUtils.h"
 
+#include "core/audio/SoundSystem.h"
+
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -36,6 +38,8 @@ private:
 	PointLight* pointLight;
 	SpotLight* spotLight;
 	bool wireframe;
+
+	SoundSystem* soundSystem;
 
 	std::vector<PointLight*> pointLights;
 public:
@@ -123,6 +127,13 @@ void LightingTest::created() {
 		pointLights.push_back(light);
 	}
 
+	AudioManager::initialise();
+
+	soundSystem = new SoundSystem();
+
+	soundSystem->createListener(camera);
+	soundSystem->playAsMusic("Music", AudioLoader::loadWave("C:/UnnamedEngine/Sound3.wav"));
+
 	Mouse::lock();
 }
 
@@ -152,6 +163,8 @@ void LightingTest::update() {
 
 	model->update();
 	model2->update();
+
+	soundSystem->update();
 }
 
 void LightingTest::render() {

@@ -16,7 +16,7 @@
  *
  *****************************************************************************/
 
-#define TEST_GUI
+#define TEST_LIGHTING
 
 #ifdef TEST_LIGHTING
 #include "LightingTest.h"
