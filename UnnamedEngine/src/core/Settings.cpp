@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   Copyright 2015 Joel Davies
+ *   Copyright 2015 - 2016 Joel Davies
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
  ***************************************************************************************************/
 
 const char* Settings::ENGINE_NAME =         "Unnamed Engine";
-const char* Settings::ENGINE_VERSION =      "V0.1.6";
+const char* Settings::ENGINE_VERSION =      "V0.1.7";
 const char* Settings::ENGINE_VERSION_NAME = "New Language";
-const char* Settings::ENGINE_DATE =         "28/12/2015";
+const char* Settings::ENGINE_DATE =         "31/12/2015";
 const char* Settings::ENGINE_BUILD =        "Experimental";
 
 /***************************************************************************************************/

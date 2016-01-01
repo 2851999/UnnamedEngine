@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   Copyright 2015 Joel Davies
+ *   Copyright 2015 - 2016 Joel Davies
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  *
  *****************************************************************************/
 
-#define TEST_LIGHTING
+#define TEST_GUI
 
 #ifdef TEST_LIGHTING
 #include "LightingTest.h"

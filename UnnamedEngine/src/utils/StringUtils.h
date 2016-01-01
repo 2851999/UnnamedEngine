@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   Copyright 2015 Joel Davies
+ *   Copyright 2015 - 2016 Joel Davies
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -58,6 +58,10 @@ inline std::string split_string_last(const std::string &s, char delimeter) {
 	while (std::getline(ss, item, delimeter))
 		split.push_back(item);
 	return split.at(split.size() - 1);
+}
+
+inline std::string substring(const std::string &s, int begin, int end) {
+	return s.substr(begin, end - begin);
 }
 
 /***************************************************************************************************/

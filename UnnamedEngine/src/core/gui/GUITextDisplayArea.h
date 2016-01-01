@@ -16,46 +16,44 @@
  *
  *****************************************************************************/
 
-#include "FileUtils.h"
+#ifndef CORE_GUI_GUITEXTDISPLAYAREA_H_
+#define CORE_GUI_GUITEXTDISPLAYAREA_H_
+
+#include "GUIComponent.h"
 
 /***************************************************************************************************
- * The FileUtils class
+ * The GUITextDisplayArea class
  ***************************************************************************************************/
 
-/* The methods used to read a file and return its contents */
-std::string FileUtils::readFileAsString(const char* path) {
-	std::ifstream input;
-	std::string   output;
-	std::string   current;
+class GUITextDisplayArea : public GUIComponent {
+private:
+	/* The text */
+	std::vector<std::string> m_text;
+public:
+	/* The constructors */
+	GUITextDisplayArea(std::string text, float width) :
+		GUIComponent(NULL) {
+		setWidth(width);
+		calculateText(text);
+	}
+	GUITextDisplayArea(std::string text, Font* font, float width) :
+		GUIComponent(NULL) {
+		renderer->font = font;
+		setWidth(width);
+		calculateText(text);
+	}
 
-	input.open(path);
+	/* Sets up the text to be displayed */
+	void calculateText(std::string text);
 
-	if (input.is_open()) {
-		while (input.good()) {
-			getline(input, current);
-			output.append(current + "\n");
-		}
-		input.close();
-	} else
-		logError("Unable to read the file '" + to_string(path) + "'");
-	return output;
-}
+	/* The render method */
+	void renderComponent() override;
 
-std::vector<std::string> FileUtils::readFileAsVector(const char* path) {
-	std::ifstream            input;
-	std::vector<std::string> output;
-	std::string              current;
-
-	input.open(path);
-
-	if (input.is_open()) {
-		while (input.good()) {
-			getline(input, current);
-			output.push_back(current);
-		}
-	} else
-		logError("Unable to read the file '" + to_string(path) + "'");
-	return output;
-}
+	/* The setters and getters */
+	inline void setText(std::string text) { calculateText(text); }
+	std::string getText();
+};
 
 /***************************************************************************************************/
+
+#endif /* CORE_GUI_GUITEXTDISPLAYAREA_H_ */

@@ -1,4 +1,13 @@
 --------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 7 (V0.1.7)
+
+* Added GUISlider
+* Added GUIWindow
+* Added GUITextDisplayArea
+
+* Fixed bug: GUITextBox didn't work properly
+
+--------------------------------------------------------------
 Release 0 | Beta 0 | Development 0 | Experimental 6 (V0.1.6)
 
 * Added DebugCamera3D

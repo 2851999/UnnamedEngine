@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   Copyright 2015 Joel Davies
+ *   Copyright 2015 - 2016 Joel Davies
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ void GUITextBoxCursor::render() {
 	}
 	if (cursorShown) {
 		Vector2f p = textBox->getPosition();
-		float x = 1 + p.getX() + (textBox->renderer->font->getWidth(textBox->renderText.substr(0, textBox->cursorIndex - textBox->viewIndexStart)));
+		float x = 1 + p.getX() + (textBox->renderer->font->getWidth(substring(textBox->renderText, 0, textBox->cursorIndex - textBox->viewIndexStart)));
 		float y = (p.getY() + (textBox->getHeight() / 2)) - (getHeight() / 2);
 		setPosition(x, y);
 		renderer->render(this, textBox->active);
@@ -165,9 +165,9 @@ void GUITextBoxSelection::render() {
 		float selectionX = 0;
 		try {
 			if (textBox->selectionIndexStart < textBox->selectionIndexEnd)
-				selectionX = p.getX() + textBox->renderer->font->getWidth(textBox->renderText.substr(0, textBox->selectionIndexStart - textBox->viewIndexStart));
+				selectionX = p.getX() + textBox->renderer->font->getWidth(substring(textBox->renderText, 0, textBox->selectionIndexStart - textBox->viewIndexStart));
 			else
-				selectionX = p.getX() + textBox->renderer->font->getWidth(textBox->renderText.substr(0, textBox->selectionIndexEnd - textBox->viewIndexStart));
+				selectionX = p.getX() + textBox->renderer->font->getWidth(substring(textBox->renderText, 0, textBox->selectionIndexEnd - textBox->viewIndexStart));
 		} catch (int e) {
 
 		}
@@ -347,7 +347,7 @@ void GUITextBox::updateRenderText() {
 	if (viewIndexEnd > text.length())
 		viewIndexEnd = text.length();
 
-	renderText = text.substr(viewIndexStart, viewIndexEnd);
+	renderText = substring(text, viewIndexStart, viewIndexEnd);
 
 	if (masked)
 		renderText = maskStr(renderText, mask);
@@ -413,9 +413,9 @@ void GUITextBox::resetSelection() {
 std::string GUITextBox::getSelection() {
 	if (isSelection) {
 		if (selectionIndexStart < selectionIndexEnd)
-			return text.substr(selectionIndexStart, selectionIndexEnd);
+			return substring(text, selectionIndexStart, selectionIndexEnd);
 		else
-			return text.substr(selectionIndexEnd, selectionIndexStart);
+			return substring(text, selectionIndexEnd, selectionIndexStart);
 	} else
 		return "";
 }
@@ -438,9 +438,9 @@ std::string GUITextBox::getRenderTextSelection() {
 			sie = viewIndexEnd;
 
 		if (selectionIndexStart <= selectionIndexEnd)
-			return renderText.substr(sis - viewIndexStart, sie - viewIndexStart);
+			return substring(renderText, sis - viewIndexStart, sie - viewIndexStart);
 		else
-			return renderText.substr(sie - viewIndexStart, sis - viewIndexStart);
+			return substring(renderText, sie - viewIndexStart, sis - viewIndexStart);
 	} else
 		return "";
 }
@@ -450,10 +450,10 @@ void GUITextBox::deleteSelection() {
 	std::string back = "";
 
 	if (selectionIndexStart < selectionIndexEnd) {
-		front = text.substr(0, selectionIndexStart);
+		front = substring(text, 0, selectionIndexStart);
 		back = text.substr(selectionIndexEnd);
 	} else {
-		front = text.substr(0, selectionIndexEnd);
+		front = substring(text, 0, selectionIndexEnd);
 		back = text.substr(selectionIndexStart);
 	}
 
@@ -487,10 +487,10 @@ void GUITextBox::onKeyPressed(int code) {
 				deleteSelection();
 			else {
 				if (text.length() > 0 && cursorIndex > 0) {
-					std::string front = text.substr(0, cursorIndex);
+					std::string front = substring(text, 0, cursorIndex);
 					std::string back = text.substr(cursorIndex);
 
-					text = front.substr(0, front.length() - 1) + back;
+					text = substring(front, 0, front.length() - 1) + back;
 
 					if (cursorIndex == viewIndexStart) {
 						cursorIndex --;
@@ -512,7 +512,7 @@ void GUITextBox::onKeyPressed(int code) {
 			if (isSelection)
 				deleteSelection();
 			else {
-				std::string front = text.substr(0, cursorIndex);
+				std::string front = substring(text, 0, cursorIndex);
 				std::string back = text.substr(cursorIndex);
 
 				text = front + back.substr(1);
@@ -578,7 +578,7 @@ void GUITextBox::onChar(int code, char character) {
 			if (isDefined(character)) {
 				if (isSelection)
 					deleteSelection();
-				std::string front = text.substr(0, cursorIndex);
+				std::string front = substring(text, 0, cursorIndex);
 				std::string back = text.substr(cursorIndex);
 
 				text = front + character + back;
@@ -704,7 +704,7 @@ void GUITextBox::onShortcut(KeyboardShortcut* e) {
 		if (isSelection)
 			deleteSelection();
 
-		std::string front = text.substr(0, cursorIndex);
+		std::string front = substring(text, 0, cursorIndex);
 		std::string back = text.substr(cursorIndex);
 
 		text = front + ClipboardUtils::getText() + back;

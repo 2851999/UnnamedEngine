@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   Copyright 2015 Joel Davies
+ *   Copyright 2015 - 2016 Joel Davies
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@
 #include "core/gui/GUIRadioCheckBox.h"
 #include "core/gui/GUITextBox.h"
 #include "core/gui/GUILoadingBar.h"
+#include "core/gui/GUISlider.h"
+#include "core/gui/GUIWindow.h"
+#include "core/gui/GUITextDisplayArea.h"
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
@@ -48,6 +51,10 @@ private:
 	GUILabel* label;
 	GUITextBox* textBox;
 	GUILoadingBar* loadingBar;
+	GUISlider* verticalSlider;
+	GUISlider* horizontalSlider;
+	GUIWindow* window;
+	GUITextDisplayArea* displayArea;
 public:
 	virtual ~GUITest() {}
 	virtual void initialise(Settings* settings);
@@ -135,6 +142,28 @@ void GUITest::created() {
 	loadingBar->borderEnabled = true;
 	loadingBar->setCurrentStage(2);
 	loadingBar->setFillColour(Colour::LIGHT_BLUE);
+
+	GUIButton* verticalSliderButton = new GUIButton("", colours, 26, 10);
+	verticalSlider = new GUISlider(verticalSliderButton, GUISlider::DIRECTION_VERTICAL, 4, 100);
+	verticalSlider->setPosition(20, 400);
+
+	GUIButton* horizontalSliderButton = new GUIButton("", colours, 10, 26);
+	horizontalSlider = new GUISlider(horizontalSliderButton, GUISlider::DIRECTION_HORIZONTAL, 100, 4);
+	horizontalSlider->setPosition(100, 400);
+
+	std::vector<Colour> closeColours;
+	closeColours.push_back(Colour::RED);
+	closeColours.push_back(Colour::BLUE);
+	closeColours.push_back(Colour::LIGHT_BLUE);
+
+	GUIButton* closeButton = new GUIButton("X", closeColours, 30, 20);
+	window = new GUIWindow("Window", Colour::WHITE, 200, 120);
+	window->setBarColour(Colour::LIGHT_BLUE);
+	window->setPosition(400, 200);
+	window->setCloseButton(closeButton);
+
+	displayArea = new GUITextDisplayArea("Hello how are you today. This will hopefully work but I have no idea.", 200);
+	displayArea->setPosition(400, 400);
 }
 
 void GUITest::update() {
@@ -145,6 +174,10 @@ void GUITest::update() {
 	radio->update();
 	textBox->update();
 	loadingBar->update();
+	verticalSlider->update();
+	horizontalSlider->update();
+	window->update();
+	displayArea->update();
 }
 
 void GUITest::render() {
@@ -163,6 +196,10 @@ void GUITest::render() {
 	radio->render();
 	textBox->render();
 	loadingBar->render();
+	verticalSlider->render();
+	horizontalSlider->render();
+	window->render();
+	displayArea->render();
 
 	renderInformation();
 }
