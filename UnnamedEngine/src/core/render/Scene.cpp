@@ -55,9 +55,9 @@ void Scene::render(Vector3f cameraPosition) {
 				m_lights.at(a)->apply();
 
 				shader = Renderer::getShader("");
+				shader->use();
 
 				for (unsigned int b = 0; b < m_objects.size(); b++) {
-					shader->use();
 
 					Matrix4f modelMatrix = m_objects.at(b)->getModelMatrix();
 
@@ -90,10 +90,9 @@ void Scene::render(Vector3f cameraPosition) {
 
 		Renderer::enableDeferredRendering();
 		Shader* shader = Renderer::getShader("");
+		shader->use();
 
 		for (unsigned int a = 0; a < m_objects.size(); a++) {
-			shader->use();
-
 			Matrix4f modelMatrix = m_objects.at(a)->getModelMatrix();
 
 			shader->setUniform("ModelMatrix", m_objects.at(a)->getModelMatrix());
@@ -138,6 +137,7 @@ void Scene::renderFinal(Vector3f cameraPosition) {
 				m_lights.at(a)->apply();
 
 				shader = Renderer::getShader("");
+				shader->use();
 
 				shader->setUniform("SpecularIntensity", m_specularIntensity);
 				shader->setUniform("EyePosition", cameraPosition);

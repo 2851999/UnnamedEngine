@@ -92,6 +92,10 @@ public:
 
 	void onScroll(double dx, double dy) override {}
 
+	void onControllerButtonPressed(ControllerButton* button) override {}
+	void onControllerButtonReleased(ControllerButton* button) override {}
+	void onControllerAxisChange(ControllerAxis* axis) override {}
+
 	/* This method simply tells the game to stop */
 	inline void requestClose() { m_closeRequested = true; }
 

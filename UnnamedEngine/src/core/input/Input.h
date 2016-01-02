@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "Controller.h"
+
 /***************************************************************************************************
  * The Mouse class
  ***************************************************************************************************/
@@ -71,10 +73,14 @@ class InputListener;
 
 class InputManager {
 private:
+	static std::vector<Controller*> m_controllers;
 	static std::vector<InputListener*> m_listeners;
 public:
 	static inline void addListener(InputListener* listener) { m_listeners.push_back(listener); }
 	static inline void removeListener(InputListener* listener) { m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), listener), m_listeners.end()); }
+	static inline void addController(Controller* controller) { m_controllers.push_back(controller); }
+	static inline void removeController(Controller* controller) { m_controllers.erase(std::remove(m_controllers.begin(), m_controllers.end(), controller), m_controllers.end()); }
+	static void checkInput();
 	static void callOnKeyPressed(int code);
 	static void callOnKeyReleased(int code);
 	static void callOnKeyTyped(int code);
@@ -87,6 +93,9 @@ public:
 	static void callOnMouseEnter();
 	static void callOnMouseLeave();
 	static void callOnScroll(double dx, double dy);
+	static void callOnControllerButtonPressed(ControllerButton* button);
+	static void callOnControllerButtonReleased(ControllerButton* button);
+	static void callOnControllerAxisChange(ControllerAxis* axis);
 };
 
 /***************************************************************************************************/
@@ -117,6 +126,10 @@ public:
 	virtual void onMouseLeave() {}
 
 	virtual void onScroll(double dx, double dy) {}
+
+	virtual void onControllerButtonPressed(ControllerButton* button) {}
+	virtual void onControllerButtonReleased(ControllerButton* button) {}
+	virtual void onControllerAxisChange(ControllerAxis* axis) {}
 };
 
 /***************************************************************************************************/

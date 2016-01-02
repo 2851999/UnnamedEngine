@@ -78,7 +78,13 @@ bool Keyboard::isPressed(int key) {
  * The InputManager class
  ***************************************************************************************************/
 
+std::vector<Controller*> InputManager::m_controllers;
 std::vector<InputListener*> InputManager::m_listeners;
+
+void InputManager::checkInput() {
+	for (unsigned int a = 0; a < m_controllers.size(); a++)
+		m_controllers.at(a)->checkInput();
+}
 
 void InputManager::callOnKeyPressed(int code) {
 	for (unsigned int a = 0; a < m_listeners.size(); a++)
@@ -138,6 +144,21 @@ void InputManager::callOnMouseLeave() {
 void InputManager::callOnScroll(double dx, double dy) {
 	for (unsigned int a = 0; a < m_listeners.size(); a++)
 		m_listeners[a]->onScroll(dx, dy);
+}
+
+void InputManager::callOnControllerButtonPressed(ControllerButton* button) {
+	for (unsigned int a = 0; a < m_listeners.size(); a++)
+		m_listeners[a]->onControllerButtonPressed(button);
+}
+
+void InputManager::callOnControllerButtonReleased(ControllerButton* button) {
+	for (unsigned int a = 0; a < m_listeners.size(); a++)
+		m_listeners[a]->onControllerButtonReleased(button);
+}
+
+void InputManager::callOnControllerAxisChange(ControllerAxis* button) {
+	for (unsigned int a = 0; a < m_listeners.size(); a++)
+		m_listeners[a]->onControllerAxisChange(button);
 }
 
 /***************************************************************************************************/

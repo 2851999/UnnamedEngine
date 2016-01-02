@@ -71,8 +71,8 @@ public:
 	static GLuint bindTexture(Texture* texture);
 	static void unbindTetxures();
 	static inline unsigned int getNumBoundTextures() { return m_boundTextures.size(); }
-	static void enableDeferredRendering() { m_deferredRendering = true; }
-	static void disableDeferredRendering() { m_deferredRendering = false; }
+	static inline void enableDeferredRendering() { m_deferredRendering = true; }
+	static inline void disableDeferredRendering() { m_deferredRendering = false; }
 };
 
 /***************************************************************************************************/

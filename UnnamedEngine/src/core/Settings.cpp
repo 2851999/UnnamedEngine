@@ -23,7 +23,7 @@
  ***************************************************************************************************/
 
 const char* Settings::ENGINE_NAME =         "Unnamed Engine";
-const char* Settings::ENGINE_VERSION =      "V0.1.8";
+const char* Settings::ENGINE_VERSION =      "V0.1.9";
 const char* Settings::ENGINE_VERSION_NAME = "New Language";
 const char* Settings::ENGINE_DATE =         "01/01/2016";
 const char* Settings::ENGINE_BUILD =        "Experimental";

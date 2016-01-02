@@ -23,11 +23,6 @@
 
 #include "core/audio/SoundSystem.h"
 
-#include <assimp/cimport.h>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <assimp/mesh.h>
-
 class LightingTest : public Game {
 private:
 	Model* model2;
@@ -60,6 +55,10 @@ public:
 	void onMouseDragged(double x, double y, double dx, double dy) {}
 	void onMouseEnter() {}
 	void onMouseLeave() {}
+
+	void onControllerButtonPressed(ControllerButton* button);
+	void onControllerButtonReleased(ControllerButton* button);
+	void onControllerAxisChange(ControllerAxis* axis);
 };
 
 void LightingTest::initialise(Settings* settings) {
@@ -127,12 +126,13 @@ void LightingTest::created() {
 		pointLights.push_back(light);
 	}
 
-	AudioManager::initialise();
-
 	soundSystem = new SoundSystem();
 
 	soundSystem->createListener(camera);
 	soundSystem->playAsMusic("Music", AudioLoader::loadWave("C:/UnnamedEngine/Sound3.wav"));
+
+	InputManager::addController(new Controller(0));
+	InputManager::addController(new Controller(1));
 
 	Mouse::lock();
 }
@@ -214,4 +214,16 @@ void LightingTest::onKeyPressed(int key) {
 		Renderer::initialiseShaders();
 	} else if (key == GLFW_KEY_F3)
 		Mouse::toggleLock();
+}
+
+void LightingTest::onControllerButtonPressed(ControllerButton* button) {
+	std::cout << "Controller: " + button->getController()->getName() + " Button: " + to_string(button->getIndex()) + " Pressed" << std::endl;
+}
+
+void LightingTest::onControllerButtonReleased(ControllerButton* button) {
+	std::cout << "Controller: " + button->getController()->getName() + " Button: " + to_string(button->getIndex()) + " Released" << std::endl;
+}
+
+void LightingTest::onControllerAxisChange(ControllerAxis* axis) {
+	std::cout << "Controller: " + axis->getController()->getName() + " Axis: " + to_string(axis->getIndex()) + " Value: " + to_string(axis->getValue()) << std::endl;
 }

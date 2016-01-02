@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "Game.h"
+#include "audio/Audio.h"
 #include "gui/GUIComponent.h"
 #include "render/Renderer.h"
 #include "ResourceLoader.h"
@@ -46,6 +47,9 @@ void Game::create() {
 
 		//Initialise the rendering system
 		Renderer::initialise();
+
+		//Initialise the audio system
+		AudioManager::initialise();
 
 		//Load default resources
 		m_font = ResourceLoader::loadFont("resources/textures/font-segoeui.png", 16, 16);
@@ -77,6 +81,8 @@ void Game::create() {
 			}
 			//Update the window
 			m_window->update();
+			//Check the input
+			InputManager::checkInput();
 		}
 		//Destroy the game and window
 		destroy();
