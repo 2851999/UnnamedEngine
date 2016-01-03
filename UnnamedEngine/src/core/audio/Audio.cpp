@@ -18,12 +18,21 @@
 
 #include <cstdio>
 
-#include "../Game.h"
 #include "Audio.h"
+#include "../BaseEngine.h"
 
 /***************************************************************************************************
  * The AudioLoader class
  ***************************************************************************************************/
+
+AudioData* AudioLoader::loadAudio(const char* path) {
+	std::string value = string_toLowerCase(to_string(path));
+	//Check the file type
+	if (string_endsWith(value, ".wav"))
+		return loadWave(path);
+	else
+		return NULL;
+}
 
 AudioData* AudioLoader::loadWave(const char* path) {
 	//Define the needed values
@@ -135,9 +144,9 @@ AudioSource::AudioSource(AudioData* data, unsigned int type) {
 
 void AudioSource::updateVolume() {
 	if (m_type == TYPE_SOUND_EFFECT)
-		m_gain = ((float) Game::current->getSettings()->getAudioSoundEffectVolume()) / 100.0f;
+		m_gain = ((float) BaseEngine::current->getSettings()->getAudioSoundEffectVolume()) / 100.0f;
 	else if (m_type == TYPE_MUSIC)
-		m_gain = ((float) Game::current->getSettings()->getAudioMusicVolume()) / 100.0f;
+		m_gain = ((float) BaseEngine::current->getSettings()->getAudioMusicVolume()) / 100.0f;
 	else {
 		m_gain = 1.0f;
 	}

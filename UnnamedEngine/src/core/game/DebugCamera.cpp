@@ -39,19 +39,21 @@ void DebugCamera3D::update(long delta) {
 	//Clamp the rotation
 	rotation.setX(clamp(rotation.getX(), minXRotation, maxXRotation));
 
-	//The current speed
-	float s = speed;
-	//Update the movement
-	if (Keyboard::isPressed(keyFaster))
-		s = fasterSpeed;
-	if (Keyboard::isPressed(keyForward))
-		moveForward(s * delta);
-	if (Keyboard::isPressed(keyBackward))
-		moveBackward(s * delta);
-	if (Keyboard::isPressed(keyLeft))
-		moveLeft(s * delta);
-	if (Keyboard::isPressed(keyRight))
-		moveRight(s * delta);
+	if (Mouse::isLocked() || ! lockMouse) {
+		//The current speed
+		float s = speed;
+		//Update the movement
+		if (Keyboard::isPressed(keyFaster))
+			s = fasterSpeed;
+		if (Keyboard::isPressed(keyForward))
+			moveForward(s * delta);
+		if (Keyboard::isPressed(keyBackward))
+			moveBackward(s * delta);
+		if (Keyboard::isPressed(keyLeft))
+			moveLeft(s * delta);
+		if (Keyboard::isPressed(keyRight))
+			moveRight(s * delta);
+	}
 
 	//Update the camera
 	Camera3D::update();

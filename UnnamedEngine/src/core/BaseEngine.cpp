@@ -16,18 +16,22 @@
  *
  *****************************************************************************/
 
-#include "Game.h"
 #include "audio/Audio.h"
+#include "BaseEngine.h"
 #include "gui/GUIComponent.h"
 #include "render/Renderer.h"
 #include "ResourceLoader.h"
 
-Game* Game::current;
+BaseEngine* BaseEngine::current;
+
+/***************************************************************************************************
+ * The BaseEngine class
+ ***************************************************************************************************/
 
 /* The implementation of the create method */
-void Game::create() {
+void BaseEngine::create() {
 	//Assigns the current game instance and sets up basic variables
-	Game::current = this;
+	BaseEngine::current = this;
 	m_settings = new Settings();
 	initialise(m_settings);
 	m_window = new Window(m_settings);
@@ -59,6 +63,12 @@ void Game::create() {
 		m_camera = new Camera2D(Matrix4f().initOrthographic(0, m_settings->getWindowWidth(), m_settings->getWindowHeight(), 0, -1, 1));
 		m_camera->update();
 
+		//Assign the maximum FPS
+		m_fpsLimiter->setMaxFPS(m_settings->getVideoMaxFPS());
+
+		//Setup the debugging GUI
+		m_debuggingGUI = new DebuggingGUI(m_settings->getWindowWidth(), m_settings->getWindowHeight());
+
 		//Notify the game that the engine has been initialised
 		created();
 
@@ -68,7 +78,9 @@ void Game::create() {
 			m_fpsCalculator->update();
 			//Update and render the game
 			update();
+			updateInterfaces();
 			render();
+			renderInterfaces();
 
 			//Render the information if needed
 			if (m_settings->getDebuggingShowInformation()) {
@@ -83,6 +95,9 @@ void Game::create() {
 			m_window->update();
 			//Check the input
 			InputManager::checkInput();
+
+			//Attempt to cap the framerate
+			m_fpsLimiter->update((int) getDelta());
 		}
 		//Destroy the game and window
 		destroy();
@@ -91,7 +106,7 @@ void Game::create() {
 }
 
 /* This method simply renders some information */
-void Game::renderInformation() {
+void BaseEngine::renderInformation() {
 	if (m_settings->getVideoDeferredRendering() && m_settings->getDebuggingShowDeferredRenderingBuffers())
 		DeferredRenderer::renderBuffers();
 	Renderer::addCamera(m_camera);
@@ -107,5 +122,11 @@ void Game::renderInformation() {
 	m_font->render("MSAA Samples:        " + to_string(m_settings->getVideoSamples()), 0, 136);
 	m_font->render("Max Anisotropic Samples: " + to_string(m_settings->getVideoMaxAnisotropicSamples()), 0, 150);
 	m_font->render("Deferred Rendering:  " + to_string(m_settings->getVideoDeferredRendering()), 0, 164);
+
+	m_debuggingGUI->update();
+	m_debuggingGUI->render();
+
 	Renderer::removeCamera();
 }
+
+/***************************************************************************************************/

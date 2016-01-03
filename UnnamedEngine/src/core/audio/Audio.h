@@ -132,6 +132,8 @@ private:
 	};
 
 public:
+	/* The method used to load an audio file */
+	static AudioData* loadAudio(const char* path);
 	/* The method used to load a Wave file */
 	static AudioData* loadWave(const char* path);
 };
@@ -162,6 +164,9 @@ public:
 	}
 	AudioSource(AudioData* data, unsigned int type, Vector3f position) : AudioSource(data, type) {
 		setPosition(position);
+	}
+	AudioSource(AudioData* data, unsigned int type, Object3D* object) : AudioSource(data, type) {
+		attachObject(object);
 	}
 
 	virtual ~AudioSource() {

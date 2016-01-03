@@ -17,7 +17,8 @@
  *****************************************************************************/
 
 #include "Texture.h"
-#include "Game.h"
+
+#include "BaseEngine.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <GL\stb_image.h>
 
@@ -46,7 +47,7 @@ void TextureParameters::apply(GLuint texture, bool bind, bool unbind) {
 		m_filter == GL_LINEAR_MIPMAP_NEAREST ||
 		m_filter == GL_LINEAR_MIPMAP_LINEAR) {
 		glGenerateMipmap(m_target);
-		glTexParameterf(m_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, Game::current->getSettings()->getVideoMaxAnisotropicSamples());
+		glTexParameterf(m_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, BaseEngine::current->getSettings()->getVideoMaxAnisotropicSamples());
 	}
 	if (unbind)
 		glBindTexture(m_target, 0);

@@ -195,22 +195,37 @@ public:
  * The renderable object classes store data about 2D and 3D objects for them to be rendered
  ***************************************************************************************************/
 
-class RenderableObject2D : public Object2D {
-private:
-	Mesh* m_mesh;
+class RenderableObject {
+protected:
+	Mesh* m_mesh = NULL;
 	Matrix4f m_modelMatrix;
 public:
+	RenderableObject() {}
+	virtual ~RenderableObject() {}
+
+	virtual void update() {}
+	virtual void render() {}
+
+	inline Mesh* getMesh() { return m_mesh; }
+	inline Matrix4f getModelMatrix() { return m_modelMatrix; }
+};
+
+class RenderableObject2D : public Object2D, public RenderableObject {
+public:
 	RenderableObject2D() { m_mesh = NULL; }
-	RenderableObject2D(Mesh* mesh) : m_mesh(mesh) {
+	RenderableObject2D(Mesh* mesh) {
+		m_mesh = mesh;
 		m_modelMatrix = Matrix4f();
 	}
-	RenderableObject2D(Mesh* mesh, Vector2f size) : m_mesh(mesh) {
+	RenderableObject2D(Mesh* mesh, Vector2f size) {
 		setSize(size);
+		m_mesh = mesh;
 		m_modelMatrix = Matrix4f();
 	}
 
-	RenderableObject2D(Mesh* mesh, float width, float height) : m_mesh(mesh) {
+	RenderableObject2D(Mesh* mesh, float width, float height) {
 		setSize(width, height);
+		m_mesh = mesh;
 		m_modelMatrix = Matrix4f();
 	}
 	virtual ~RenderableObject2D() {}
@@ -227,27 +242,24 @@ public:
 		m_modelMatrix.scale(getScale());
 	}
 
-	virtual void render();
-
-	inline Mesh* getMesh() { return m_mesh; }
-	inline Matrix4f getModelMatrix() { return m_modelMatrix; }
+	void render();
 };
 
-class RenderableObject3D : public Object3D {
-private:
-	Mesh* m_mesh;
-	Matrix4f m_modelMatrix;
+class RenderableObject3D : public Object3D, public RenderableObject {
 public:
 	RenderableObject3D() { m_mesh = NULL; }
-	RenderableObject3D(Mesh* mesh) : m_mesh(mesh) {
+	RenderableObject3D(Mesh* mesh) {
+		m_mesh = mesh;
 		m_modelMatrix = Matrix4f();
 	}
-	RenderableObject3D(Mesh* mesh, Vector3f size) : m_mesh(mesh) {
+	RenderableObject3D(Mesh* mesh, Vector3f size) {
 		setSize(size);
+		m_mesh = mesh;
 		m_modelMatrix = Matrix4f();
 	}
-	RenderableObject3D(Mesh* mesh, float width, float height, float depth) : m_mesh(mesh) {
+	RenderableObject3D(Mesh* mesh, float width, float height, float depth) {
 		setSize(width, height, depth);
+		m_mesh = mesh;
 		m_modelMatrix = Matrix4f();
 	}
 	virtual ~RenderableObject3D() {}
@@ -265,10 +277,7 @@ public:
 		m_modelMatrix.scale(getScale());
 	}
 
-	virtual void render();
-
-	inline Mesh* getMesh() { return m_mesh; }
-	inline Matrix4f getModelMatrix() { return m_modelMatrix; }
+	void render();
 };
 
 /***************************************************************************************************/

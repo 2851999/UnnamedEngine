@@ -23,7 +23,7 @@
 
 #include "core/audio/SoundSystem.h"
 
-class LightingTest : public Game {
+class LightingTest : public BaseEngine {
 private:
 	Model* model2;
 	Model* model;
@@ -45,16 +45,6 @@ public:
 	virtual void render();
 	virtual void destroy();
 	void onKeyPressed(int code);
-	void onKeyReleased(int code) {}
-	void onKeyTyped(int code) {}
-	void onChar(int code, char character) {}
-	void onMousePressed(int button) {}
-	void onMouseReleased(int button) {}
-	void onMouseClicked(int button) {}
-	void onMouseMoved(double x, double y, double dx, double dy) {}
-	void onMouseDragged(double x, double y, double dx, double dy) {}
-	void onMouseEnter() {}
-	void onMouseLeave() {}
 
 	void onControllerButtonPressed(ControllerButton* button);
 	void onControllerButtonReleased(ControllerButton* button);
@@ -129,7 +119,7 @@ void LightingTest::created() {
 	soundSystem = new SoundSystem();
 
 	soundSystem->createListener(camera);
-	soundSystem->playAsMusic("Music", AudioLoader::loadWave("C:/UnnamedEngine/Sound3.wav"));
+	soundSystem->playAsMusic("Music", ResourceLoader::loadAudio("C:/UnnamedEngine/Sound2.wav"));
 
 	InputManager::addController(new Controller(0));
 	InputManager::addController(new Controller(1));
@@ -140,25 +130,27 @@ void LightingTest::created() {
 void LightingTest::update() {
 	camera->update(getDelta());
 
-	if (getWindow()->getKey(GLFW_KEY_RIGHT)) {
-		//model->rotation.setY(model->rotation.getY() + 0.05 * getDelta());
-		//pointLight->setPosition(pointLight->getPosition() + Vector3f(0.002 * getDelta(), 0.0, 0.0));
-		//spotLight->getPointLight()->setPosition(spotLight->getPointLight()->getPosition() + Vector3f(0.001 * getDelta(), 0.0, 0.0));
-		model2->position.setX(model2->position.getX() + 0.01 * getDelta());
-	} else if (getWindow()->getKey(GLFW_KEY_LEFT)) {
-		//pointLight->setPosition(pointLight->getPosition() + Vector3f(-0.002 * getDelta(), 0.0, 0.0));
-		//spotLight->getPointLight()->setPosition(spotLight->getPointLight()->getPosition() + Vector3f(-0.001 * getDelta(), 0.0, 0.0));
-		model2->position.setX(model2->position.getX() - 0.01 * getDelta());
-	}
+	if (Mouse::isLocked()) {
+		if (getWindow()->getKey(GLFW_KEY_RIGHT)) {
+			//model->rotation.setY(model->rotation.getY() + 0.05 * getDelta());
+			//pointLight->setPosition(pointLight->getPosition() + Vector3f(0.002 * getDelta(), 0.0, 0.0));
+			//spotLight->getPointLight()->setPosition(spotLight->getPointLight()->getPosition() + Vector3f(0.001 * getDelta(), 0.0, 0.0));
+			model2->position.setX(model2->position.getX() + 0.01 * getDelta());
+		} else if (getWindow()->getKey(GLFW_KEY_LEFT)) {
+			//pointLight->setPosition(pointLight->getPosition() + Vector3f(-0.002 * getDelta(), 0.0, 0.0));
+			//spotLight->getPointLight()->setPosition(spotLight->getPointLight()->getPosition() + Vector3f(-0.001 * getDelta(), 0.0, 0.0));
+			model2->position.setX(model2->position.getX() - 0.01 * getDelta());
+		}
 
-	if (getWindow()->getKey(GLFW_KEY_R))
-		model2->rotation.setY(model2->rotation.getY() + 0.05 * getDelta());
+		if (getWindow()->getKey(GLFW_KEY_R))
+			model2->rotation.setY(model2->rotation.getY() + 0.05 * getDelta());
 
-	for (unsigned int a = 0; a < pointLights.size(); a++) {
-		if (getWindow()->getKey(GLFW_KEY_PAGE_UP))
-			pointLights.at(a)->setPosition(Vector3f(pointLights.at(a)->getPosition().getX(), pointLights.at(a)->getPosition().getY() + 0.0005f * getDelta(), pointLights.at(a)->getPosition().getZ()));
-		if (getWindow()->getKey(GLFW_KEY_PAGE_DOWN))
-			pointLights.at(a)->setPosition(Vector3f(pointLights.at(a)->getPosition().getX(), pointLights.at(a)->getPosition().getY() - 0.0005f * getDelta(), pointLights.at(a)->getPosition().getZ()));
+		for (unsigned int a = 0; a < pointLights.size(); a++) {
+			if (getWindow()->getKey(GLFW_KEY_PAGE_UP))
+				pointLights.at(a)->setPosition(Vector3f(pointLights.at(a)->getPosition().getX(), pointLights.at(a)->getPosition().getY() + 0.0005f * getDelta(), pointLights.at(a)->getPosition().getZ()));
+			if (getWindow()->getKey(GLFW_KEY_PAGE_DOWN))
+				pointLights.at(a)->setPosition(Vector3f(pointLights.at(a)->getPosition().getX(), pointLights.at(a)->getPosition().getY() - 0.0005f * getDelta(), pointLights.at(a)->getPosition().getZ()));
+		}
 	}
 
 	model->update();
@@ -179,10 +171,11 @@ void LightingTest::render() {
 	if (wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	scene->render(camera->position);
 
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	glDisable(GL_CULL_FACE);
 
 	if (wireframe)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

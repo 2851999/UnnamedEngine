@@ -31,7 +31,7 @@
 
 class Scene {
 private:
-	std::vector<RenderableObject3D*> m_objects;
+	std::vector<RenderableObject*> m_objects;
 	std::vector<LightSource*> m_lights;
 
 	bool m_lightingEnabled = true;
@@ -40,9 +40,9 @@ private:
 public:
 	virtual ~Scene() {}
 
-	inline void add(RenderableObject3D* object) { m_objects.push_back(object); }
+	inline void add(RenderableObject* object) { m_objects.push_back(object); }
 	inline void add(LightSource* light) { m_lights.push_back(light); }
-	inline void remove(RenderableObject3D* object) { m_objects.erase(std::remove(m_objects.begin(), m_objects.end(), object), m_objects.end()); }
+	inline void remove(RenderableObject* object) { m_objects.erase(std::remove(m_objects.begin(), m_objects.end(), object), m_objects.end()); }
 	inline void remove(LightSource* light) { m_lights.erase(std::remove(m_lights.begin(), m_lights.end(), light), m_lights.end()); }
 
 	void update();
@@ -56,7 +56,7 @@ public:
 
 	inline unsigned int getNumObjects() { return m_objects.size(); }
 	inline unsigned int getNumLights() { return m_lights.size(); }
-	inline RenderableObject3D* getObject(unsigned int n) { return m_objects.at(n); }
+	inline RenderableObject* getObject(unsigned int n) { return m_objects.at(n); }
 	inline LightSource* getLight(unsigned int n) { return m_lights.at(n); }
 
 	inline bool isLightingEnabled() { return m_lightingEnabled; }

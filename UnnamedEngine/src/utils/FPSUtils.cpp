@@ -17,8 +17,9 @@
  *****************************************************************************/
 
 #include <iostream>
+
+#include "FPSUtils.h"
 #include "Time.h"
-#include "FPSCalculator.h"
 
 /***************************************************************************************************
  * The FPSCalculator class
@@ -76,6 +77,27 @@ void FPSCalculator::reset() {
 	m_started = false;
 	m_lastDeltaFrameTime = 0;
 	m_lastFrameTime = 0;
+}
+
+/***************************************************************************************************/
+
+/***************************************************************************************************
+ * The FPSLimiter class
+ ***************************************************************************************************/
+
+void FPSLimiter::setMaxFPS(int fps) {
+	m_maxFPS = fps;
+	m_targetDelta = 1000 / m_maxFPS;
+}
+
+void FPSLimiter::update(int currentDelta) {
+	if (m_maxFPS != -1) {
+		int difference = m_targetDelta - currentDelta;
+		if (difference > 0)
+			Time::sleep(difference);
+		else
+			Time::sleep(m_targetDelta);
+	}
 }
 
 /***************************************************************************************************/

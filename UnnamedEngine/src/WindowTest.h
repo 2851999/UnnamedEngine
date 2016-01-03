@@ -24,7 +24,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/mesh.h>
 
-class WindowTest : public Game {
+class WindowTest : public BaseEngine {
 private:
 	RenderableObject3D object;
 	Model* model2;

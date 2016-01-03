@@ -17,7 +17,8 @@
  *****************************************************************************/
 
 #include "Input.h"
-#include "../Game.h"
+
+#include "../BaseEngine.h"
 
 /***************************************************************************************************
  * The Mouse class
@@ -31,20 +32,20 @@ bool Mouse::middleButtonDown = false;
 bool Mouse::rightMouseDown = false;
 
 bool Mouse::isPressed(int button) {
-	int state = glfwGetMouseButton(Game::current->getWindow()->getInstance(), button);
-	return state == GLFW_PRESS || (Game::current->getSettings()->getMouseEventsRepeat() && state == GLFW_REPEAT);
+	int state = glfwGetMouseButton(BaseEngine::current->getWindow()->getInstance(), button);
+	return state == GLFW_PRESS || (BaseEngine::current->getSettings()->getMouseEventsRepeat() && state == GLFW_REPEAT);
 }
 
 void Mouse::setPosition(double x, double y) {
-	glfwSetCursorPos(Game::current->getWindow()->getInstance(), x, y);
+	glfwSetCursorPos(BaseEngine::current->getWindow()->getInstance(), x, y);
 }
 
 void Mouse::centre() {
-	setPosition(Game::current->getSettings()->getWindowWidth() / 2, Game::current->getSettings()->getWindowHeight() / 2);
+	setPosition(BaseEngine::current->getSettings()->getWindowWidth() / 2, BaseEngine::current->getSettings()->getWindowHeight() / 2);
 }
 
 void Mouse::lock() {
-	glfwSetInputMode(Game::current->getWindow()->getInstance(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(BaseEngine::current->getWindow()->getInstance(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	m_cursorLocked = true;
 }
 
@@ -56,7 +57,7 @@ void Mouse::toggleLock() {
 }
 
 void Mouse::unlock() {
-	glfwSetInputMode(Game::current->getWindow()->getInstance(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(BaseEngine::current->getWindow()->getInstance(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	m_cursorLocked = false;
 	centre();
 }
@@ -68,8 +69,8 @@ void Mouse::unlock() {
  ***************************************************************************************************/
 
 bool Keyboard::isPressed(int key) {
-	int state = glfwGetKey(Game::current->getWindow()->getInstance(), key);
-	return state == GLFW_PRESS || (Game::current->getSettings()->getKeyboardEventsRepeat() && state == GLFW_REPEAT);
+	int state = glfwGetKey(BaseEngine::current->getWindow()->getInstance(), key);
+	return state == GLFW_PRESS || (BaseEngine::current->getSettings()->getKeyboardEventsRepeat() && state == GLFW_REPEAT);
 }
 
 /***************************************************************************************************/
@@ -168,7 +169,7 @@ void InputManager::callOnControllerAxisChange(ControllerAxis* button) {
  ***************************************************************************************************/
 
 void input_callback_key(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (action == GLFW_PRESS || (Game::current->getSettings()->getKeyboardEventsRepeat() && action == GLFW_REPEAT)) {
+	if (action == GLFW_PRESS || (BaseEngine::current->getSettings()->getKeyboardEventsRepeat() && action == GLFW_REPEAT)) {
 		InputManager::callOnKeyPressed(key);
 	} else if (action == GLFW_RELEASE) {
 		InputManager::callOnKeyReleased(key);
@@ -181,7 +182,7 @@ void input_callback_char(GLFWwindow* window, unsigned int codepoint) {
 }
 
 void input_callback_mouseButton(GLFWwindow* window, int button, int action, int mods) {
-	if (action == GLFW_PRESS || (Game::current->getSettings()->getMouseEventsRepeat() && action == GLFW_REPEAT)) {
+	if (action == GLFW_PRESS || (BaseEngine::current->getSettings()->getMouseEventsRepeat() && action == GLFW_REPEAT)) {
 		if (button == GLFW_MOUSE_BUTTON_LEFT)
 			Mouse::leftButtonDown = true;
 		else if (button == GLFW_MOUSE_BUTTON_MIDDLE)

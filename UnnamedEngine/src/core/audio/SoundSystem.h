@@ -51,13 +51,16 @@ public:
 	inline void addSource(std::string key, AudioData* data, unsigned int type) { addSource(key, new AudioSource(data, type)); }
 	inline void addSource(std::string key, AudioData* data, unsigned int type, Vector2f position) { addSource(key, new AudioSource(data, type, position)); }
 	inline void addSource(std::string key, AudioData* data, unsigned int type, Vector3f position) { addSource(key, new AudioSource(data, type, position)); }
+	inline void addSource(std::string key, AudioData* data, unsigned int type, Object3D* object) { addSource(key, new AudioSource(data, type, object)); }
 
 	inline void addSoundEffect(std::string key, AudioData* data) { addSource(key, new AudioSource(data, AudioSource::TYPE_SOUND_EFFECT)); }
 	inline void addSoundEffect(std::string key, AudioData* data, Vector2f position) { addSource(key, new AudioSource(data, AudioSource::TYPE_SOUND_EFFECT, position)); }
 	inline void addSoundEffect(std::string key, AudioData* data, Vector3f position) { addSource(key, new AudioSource(data, AudioSource::TYPE_SOUND_EFFECT, position)); }
+	inline void addSoundEffect(std::string key, AudioData* data, Object3D* object) { addSource(key, new AudioSource(data, AudioSource::TYPE_SOUND_EFFECT, object)); }
 	inline void addMusic(std::string key, AudioData* data) { addSource(key, new AudioSource(data, AudioSource::TYPE_MUSIC)); }
 	inline void addMusic(std::string key, AudioData* data, Vector2f position) { addSource(key, new AudioSource(data, AudioSource::TYPE_MUSIC, position)); }
 	inline void addMusic(std::string key, AudioData* data, Vector3f position) { addSource(key, new AudioSource(data, AudioSource::TYPE_MUSIC, position)); }
+	inline void addMusic(std::string key, AudioData* data, Object3D* object) { addSource(key, new AudioSource(data, AudioSource::TYPE_MUSIC, object)); }
 
 	/* The methods used to play, pause, resume and stop playing audio */
 	void play(std::string key);
@@ -80,6 +83,11 @@ public:
 		play(key);
 	}
 
+	inline void playAsSoundEffect(std::string key, AudioData* data, Object3D* object) {
+		addSoundEffect(key, data, object);
+		play(key);
+	}
+
 	inline void playAsMusic(std::string key, AudioData* data) {
 		addMusic(key, data);
 		play(key);
@@ -92,6 +100,11 @@ public:
 
 	inline void playAsMusic(std::string key, AudioData* data, Vector3f position) {
 		addMusic(key, data, position);
+		play(key);
+	}
+
+	inline void playAsMusic(std::string key, AudioData* data, Object3D* object) {
+		addMusic(key, data, object);
 		play(key);
 	}
 

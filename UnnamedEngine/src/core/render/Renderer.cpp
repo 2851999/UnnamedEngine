@@ -18,10 +18,10 @@
 
 #include "../../utils/FileUtils.h"
 #include "../ResourceLoader.h"
-#include "../Game.h"
 #include "lighting/Light.h"
 
 #include "Renderer.h"
+#include "../BaseEngine.h"
 
 /***************************************************************************************************
  * The Renderer class is responsible for rendering
@@ -223,8 +223,8 @@ RenderableObject2D* DeferredRenderer::m_depthQuad;
 void DeferredRenderer::initialise() {
 	m_geometryBuffer = new GeometryBuffer();
 
-	int width = Game::current->getSettings()->getWindowWidth();
-	int height = Game::current->getSettings()->getWindowHeight();
+	int width = BaseEngine::current->getSettings()->getWindowWidth();
+	int height = BaseEngine::current->getSettings()->getWindowHeight();
 
 	m_camera = new Camera2D(Matrix4f().initOrthographic(0, width, height, 0, -1, 1));
 	m_camera->update();

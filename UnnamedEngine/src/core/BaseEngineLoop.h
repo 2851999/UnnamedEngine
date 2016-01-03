@@ -16,36 +16,22 @@
  *
  *****************************************************************************/
 
-#ifndef UTILS_FPSCALCULATOR_H_
-#define UTILS_FPSCALCULATOR_H_
+#ifndef CORE_GUI_BASEENGINELOOP_H_
+#define CORE_GUI_BASEENGINELOOP_H_
 
 /***************************************************************************************************
- * The FPSCalculator class
+ * The BaseEngineLoop class consists of overridable methods that can be used to get engine events
  ***************************************************************************************************/
 
-class FPSCalculator {
-private:
-	unsigned int m_mode;
-	long m_lastFrameTime;
-	long m_lastDeltaFrameTime;
-	long m_currentDeltaTime;
-	int m_currentFPS;
-	int m_fpsCount;
-	bool m_started;
+class BaseEngineLoop {
 public:
-	static const unsigned int MODE_FPS_OFF = 0;
-	static const unsigned int MODE_FPS_PER_FRAME = 1;
-	static const unsigned int MODE_FPS_PER_SECOND = 2;
-	FPSCalculator();
-	FPSCalculator(unsigned int mode);
-	void update();
-	void reset();
-	void setMode(unsigned int mode) { m_mode = mode; }
-	int getMode() { return m_mode; }
-	long getDelta() { return m_currentDeltaTime; }
-	int getFPS() { return m_currentFPS; }
+	BaseEngineLoop() {}
+	virtual ~BaseEngineLoop() {}
+
+	virtual void update() {}
+	virtual void render() {}
 };
 
 /***************************************************************************************************/
 
-#endif /* UTILS_TIME_H_ */
+#endif /* CORE_GUI_BASEENGINELOOP_H_ */

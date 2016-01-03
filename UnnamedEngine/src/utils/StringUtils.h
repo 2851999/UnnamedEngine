@@ -20,6 +20,7 @@
 #define CORE_STRINGUTILS_H_
 
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -40,6 +41,15 @@ inline std::string string_join(T1 a, T2 b) {
 	std::stringstream ss;
 	ss << a << b;
 	return ss.str();
+}
+
+inline bool string_endsWith(std::string value, std::string ending) {
+	return value.compare(value.length() - ending.length(), ending.length(), ending) == 0;
+}
+
+inline std::string string_toLowerCase(std::string value) {
+	std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+	return value;
 }
 
 inline std::vector<std::string> split_string(const std::string &s, char delimeter) {

@@ -18,7 +18,7 @@
 
 #include "GeometryBuffer.h"
 
-#include "../Game.h"
+#include "../BaseEngine.h"
 
 /***************************************************************************************************
  * The GeometryBuffer class
@@ -27,8 +27,8 @@
 GeometryBuffer::GeometryBuffer() {
 	m_fbo = new FBO(GL_FRAMEBUFFER);
 	TextureParameters parameters = TextureParameters().setFilter(GL_NEAREST).setShouldClamp(true);
-	int width = Game::current->getSettings()->getWindowWidth();
-	int height = Game::current->getSettings()->getWindowHeight();
+	int width = BaseEngine::current->getSettings()->getWindowWidth();
+	int height = BaseEngine::current->getSettings()->getWindowHeight();
 	m_fbo->add(new RenderTexture(width, height, GL_RGBA16F, GL_RGBA, GL_COLOR_ATTACHMENT0, GL_FLOAT, parameters));
 	m_fbo->add(new RenderTexture(width, height, GL_RGBA16F, GL_RGBA, GL_COLOR_ATTACHMENT1, GL_FLOAT, parameters));
 	m_fbo->add(new RenderTexture(width, height, GL_RGBA16F, GL_RGBA, GL_COLOR_ATTACHMENT2, GL_FLOAT, parameters));

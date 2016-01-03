@@ -16,22 +16,23 @@
  *
  *****************************************************************************/
 
-#ifndef CORE_GAME_H_
-#define CORE_GAME_H_
+#ifndef CORE_BASEENGINE_H_
+#define CORE_BASEENGINE_H_
 
-#include "../utils/FPSCalculator.h"
+#include "../utils/FPSUtils.h"
 #include "input/Input.h"
 #include "gui/Font.h"
 #include "Settings.h"
 #include "Camera.h"
 #include "Window.h"
+#include "debugging/DebuggingGUI.h"
 
 /***************************************************************************************************
- * The Game class consists of the settings and window for a game and will also handle the main
+ * The BaseEngine class consists of the settings and window for a game and will also handle the main
  * game loop
  ***************************************************************************************************/
 
-class Game : public InputListener {
+class BaseEngine : public InputListener {
 private:
 	/* The default font and camera used to render debug information */
 	Font* m_font;
@@ -46,22 +47,33 @@ private:
 	/* The FPS calculator used to calculate the FPS and delta time */
 	FPSCalculator* m_fpsCalculator;
 
+	/* The FPS limiter used to limit the maximum FPS */
+	FPSLimiter* m_fpsLimiter;
+
 	/* A boolean used to request the game to stop */
 	bool m_closeRequested;
+
+	/* The interfaces */
+	std::vector<BaseEngineLoop*> m_interfaces;
+
+	/* The debugging GUI */
+	DebuggingGUI* m_debuggingGUI;
 public:
-	/* The current instance of the game */
-	static Game* current;
+	/* The current instance of the base engine */
+	static BaseEngine* current;
 
 	/* The default constructor */
-	Game() {
+	BaseEngine() {
 		m_font = NULL;
 		m_window = NULL;
 		m_closeRequested = false;
 		m_settings = new Settings();
 		m_fpsCalculator = new FPSCalculator();
+		m_fpsLimiter = new FPSLimiter();
 		m_camera = NULL;
+		m_debuggingGUI = NULL;
 	}
-	virtual ~Game() {}
+	virtual ~BaseEngine() {}
 
 	/* This method is called to start the main game loop */
 	void create();
@@ -75,6 +87,21 @@ public:
 	virtual void update() {}
 	virtual void render() {}
 	virtual void destroy() {}
+
+	/* The methods used to add and remove a BaseEngineLoop interface */
+	inline void add(BaseEngineLoop* instance) { m_interfaces.push_back(instance); }
+	inline void remove(BaseEngineLoop* instance) { m_interfaces.erase(std::remove(m_interfaces.begin(), m_interfaces.end(), instance)); }
+
+	/* The methods used to notify instances of the BaseEngineLoop of various events */
+	inline void updateInterfaces() {
+		for (unsigned int a = 0; a < m_interfaces.size(); a++)
+			m_interfaces.at(a)->update();
+	}
+
+	inline void renderInterfaces() {
+		for (unsigned int a = 0; a < m_interfaces.size(); a++)
+			m_interfaces.at(a)->render();
+	}
 
 	/* Input methods inherited from the InputListener */
 	void onKeyPressed(int code) override {}
@@ -107,5 +134,7 @@ public:
 	Window* getWindow() { return m_window; }
 	Settings* getSettings() { return m_settings; }
 };
+
+/***************************************************************************************************/
 
 #endif

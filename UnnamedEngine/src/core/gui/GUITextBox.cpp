@@ -404,6 +404,14 @@ int GUITextBox::getIndex(double x) {
 	return newPlace;
 }
 
+void GUITextBox::clear() {
+	text = "";
+	cursorIndex = 0;
+	viewIndexStart = 0;
+	viewIndexEnd = 0;
+	resetSelection();
+}
+
 void GUITextBox::resetSelection() {
 	isSelection = false;
 	selectionIndexStart = 0;
@@ -575,7 +583,7 @@ void GUITextBox::onChar(int code, char character) {
 		} else if (code == GLFW_KEY_LEFT && ! Keyboard::isPressed(GLFW_KEY_LEFT_SHIFT) && ! Keyboard::isPressed(GLFW_KEY_RIGHT_SHIFT)) {
 		} else if (code == GLFW_KEY_RIGHT && ! Keyboard::isPressed(GLFW_KEY_LEFT_SHIFT) && ! Keyboard::isPressed(GLFW_KEY_RIGHT_SHIFT)) {
 		} else {
-			if (isDefined(character)) {
+			if (isDefined(character) || character == ' ') {
 				if (isSelection)
 					deleteSelection();
 				std::string front = substring(text, 0, cursorIndex);

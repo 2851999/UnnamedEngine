@@ -17,8 +17,9 @@
  *****************************************************************************/
 
 #include "Scene.h"
+
+#include "../BaseEngine.h"
 #include "Renderer.h"
-#include "../Game.h"
 
 /***************************************************************************************************
  * The Scene class
@@ -31,7 +32,7 @@ void Scene::update() {
 
 void Scene::render(Vector3f cameraPosition) {
 	//Check how the rendering should be done
-	if (m_lightingEnabled && ! Game::current->getSettings()->getVideoDeferredRendering()) {
+	if (m_lightingEnabled && ! BaseEngine::current->getSettings()->getVideoDeferredRendering()) {
 		//Forward lighting
 
 		Renderer::setShader(Renderer::getShader("AmbientLight"));
@@ -55,9 +56,9 @@ void Scene::render(Vector3f cameraPosition) {
 				m_lights.at(a)->apply();
 
 				shader = Renderer::getShader("");
-				shader->use();
 
 				for (unsigned int b = 0; b < m_objects.size(); b++) {
+					shader->use();
 
 					Matrix4f modelMatrix = m_objects.at(b)->getModelMatrix();
 
@@ -79,7 +80,7 @@ void Scene::render(Vector3f cameraPosition) {
 			glDisable(GL_BLEND);
 
 		}
-	} else if (Game::current->getSettings()->getVideoDeferredRendering()) {
+	} else if (BaseEngine::current->getSettings()->getVideoDeferredRendering()) {
 		//Deferred geometry
 
 		Renderer::setShader(Renderer::getShader("GeometryShader"));
@@ -90,9 +91,10 @@ void Scene::render(Vector3f cameraPosition) {
 
 		Renderer::enableDeferredRendering();
 		Shader* shader = Renderer::getShader("");
-		shader->use();
 
 		for (unsigned int a = 0; a < m_objects.size(); a++) {
+			shader->use();
+
 			Matrix4f modelMatrix = m_objects.at(a)->getModelMatrix();
 
 			shader->setUniform("ModelMatrix", m_objects.at(a)->getModelMatrix());
@@ -114,7 +116,7 @@ void Scene::render(Vector3f cameraPosition) {
 
 void Scene::renderFinal(Vector3f cameraPosition) {
 	//Check how the rendering should be done
-	if (m_lightingEnabled && Game::current->getSettings()->getVideoDeferredRendering()) {
+	if (m_lightingEnabled && BaseEngine::current->getSettings()->getVideoDeferredRendering()) {
 		//Deferred lighting
 
 		Renderer::enableDeferredRendering();
@@ -137,7 +139,6 @@ void Scene::renderFinal(Vector3f cameraPosition) {
 				m_lights.at(a)->apply();
 
 				shader = Renderer::getShader("");
-				shader->use();
 
 				shader->setUniform("SpecularIntensity", m_specularIntensity);
 				shader->setUniform("EyePosition", cameraPosition);
@@ -154,7 +155,7 @@ void Scene::renderFinal(Vector3f cameraPosition) {
 		}
 		Renderer::unbindTetxures();
 		Renderer::disableDeferredRendering();
-	} else if (Game::current->getSettings()->getVideoDeferredRendering()) {
+	} else if (BaseEngine::current->getSettings()->getVideoDeferredRendering()) {
 		//Deferred
 
 		Renderer::enableDeferredRendering();

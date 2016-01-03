@@ -64,6 +64,7 @@ private:
 	int         m_video_max_anisotropic_samples;
 	Vector2i    m_video_resolution;
 	bool		m_video_deferred_rendering;
+	int         m_video_max_fps;
 
 	/* The values that correspond to specific 'audio' settings */
 	unsigned int m_audio_volume_sound_effect;
@@ -103,6 +104,7 @@ public:
 		m_video_max_anisotropic_samples = 0;
 		m_video_resolution   = VIDEO_RESOLUTION_DEFAULT;
 		m_video_deferred_rendering = false;
+		m_video_max_fps = -1;
 
 		m_audio_volume_sound_effect = 100;
 		m_audio_volume_music = 100;
@@ -133,6 +135,7 @@ public:
 	inline void setVideoMaxAnisotropicSamples(int maxAnisotropicSamples) { m_video_max_anisotropic_samples = maxAnisotropicSamples; }
 	inline void setVideoResolution(Vector2i videoResolution)             { m_video_resolution              = videoResolution;       }
 	inline void setVideoDeferredRendering(bool videoDeferredRendering)   { m_video_deferred_rendering      = videoDeferredRendering; }
+	inline void setVideoMaxFPS(int maxFPS) { m_video_max_fps = maxFPS; }
 
 	inline void setAudioSoundEffectVolume(unsigned int soundEffectVolume) { m_audio_volume_sound_effect = soundEffectVolume; }
 	inline void setAudioMusicVolume(unsigned int musicVolume) { m_audio_volume_music = musicVolume; }
@@ -158,6 +161,7 @@ public:
 	inline int         getVideoMaxAnisotropicSamples()     { return m_video_max_anisotropic_samples; }
 	inline Vector2i    getVideoResolution()                { return m_video_resolution;        }
 	inline bool		   getVideoDeferredRendering()         { return m_video_deferred_rendering; }
+	inline int         getVideoMaxFPS()                    { return m_video_max_fps;           }
 
 	inline unsigned int getAudioSoundEffectVolume() { return m_audio_volume_sound_effect; }
 	inline unsigned int getAudioMusicVolume() { return m_audio_volume_music; }

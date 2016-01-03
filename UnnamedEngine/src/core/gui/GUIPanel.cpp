@@ -16,23 +16,35 @@
  *
  *****************************************************************************/
 
-#include <GL/GLEW/glew.h>
-#include <GL/GLFW/glfw3.h>
-#include <iostream>
-#include <string>
-#include "ClipboardUtils.h"
-#include "../core/BaseEngine.h"
+#include "../BaseEngine.h"
+#include "GUIPanel.h"
 
 /***************************************************************************************************
- * The ClipboardUtils class
+ * The GUIPanel class
  ***************************************************************************************************/
 
-void ClipboardUtils::setText(std::string text) {
-	glfwSetClipboardString(BaseEngine::current->getWindow()->getInstance(), text.c_str());
+GUIPanel::GUIPanel(std::string name, bool autoUpdate) {
+	m_group = new GUIGroup(name);
+	attach(m_group);
+	if (autoUpdate)
+		BaseEngine::current->add(this);
 }
 
-std::string ClipboardUtils::getText() {
-	return std::string(glfwGetClipboardString(BaseEngine::current->getWindow()->getInstance()));
+void GUIPanel::add(GUIComponent* component) {
+	if (m_addListener)
+		component->addListener(this);
+	m_group->add(component);
+}
+
+void GUIPanel::setResolution(Vector2f resolution) {
+	if (resolution.getX() == -1)
+		m_resolution = resolution;
+	else {
+		float scaleWidth = resolution.getX() / m_resolution.getX();
+		float scaleHeight = resolution.getY() / m_resolution.getY();
+		m_resolution = resolution;
+		scale(Vector2f(scaleWidth, scaleHeight));
+	}
 }
 
 /***************************************************************************************************/

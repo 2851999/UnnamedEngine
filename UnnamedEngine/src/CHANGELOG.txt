@@ -1,4 +1,21 @@
 --------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 10 (V0.2.0)
+
+* Added RenderableObject
+* Added FPSLimiter
+* Added BaseEngineLoop
+* Added GUIPanel
+* Added DebuggingGUI
+
+* Renamed Game to BaseEngine
+
+* ClipboardUtils uses the GLFW methods instead of the windows
+  ones
+
+* Fixed bug: Lighting was broken last time
+* Fixed bug: GUITextBox didn't accept spaces
+
+--------------------------------------------------------------
 Release 0 | Beta 0 | Development 0 | Experimental 9 (V0.1.9)
 
 * Added Controller

@@ -23,6 +23,7 @@
 #include "render/Shader.h"
 #include "gui/Font.h"
 #include "Texture.h"
+#include "audio/Audio.h"
 
 /***************************************************************************************************
  * The ResourceLoader class creates methods that can be used to load resources
@@ -39,6 +40,7 @@ public:
 	static        RenderShader* loadRenderShader(const char* path, const char* name, const char* type);
 	static        Font*    loadFont   (const char* path, float gridSize, float size);
 	static        Font*    loadFont   (const char* path, float gridSize, float size, Colour colour);
+	static inline AudioData* loadAudio(const char* path) { return AudioLoader::loadAudio(path); }
 };
 
 /***************************************************************************************************/

@@ -17,14 +17,15 @@
  *****************************************************************************/
 
 #include "GUIWindow.h"
-#include "../Game.h"
+
+#include "../BaseEngine.h"
 
 /***************************************************************************************************
  * The GUIWindow class
  ***************************************************************************************************/
 
 void GUIWindow::centre() {
-	setPosition((Game::current->getSettings()->getWindowWidth() / 2) - (getWidth() / 2), (Game::current->getSettings()->getWindowHeight() / 2) - (getHeight() / 2));
+	setPosition((BaseEngine::current->getSettings()->getWindowWidth() / 2) - (getWidth() / 2), (BaseEngine::current->getSettings()->getWindowHeight() / 2) - (getHeight() / 2));
 }
 
 void GUIWindow::updateComponent() {

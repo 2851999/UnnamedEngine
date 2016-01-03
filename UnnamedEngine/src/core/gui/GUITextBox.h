@@ -144,6 +144,8 @@ public:
 
 	int getIndex(double x);
 
+	void clear();
+
 	void resetSelection();
 
 	std::string getSelection();

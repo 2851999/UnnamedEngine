@@ -19,6 +19,7 @@
 #ifndef UTILS_TIME_H_
 #define UTILS_TIME_H_
 
+#include <windows.h>
 #include <GL/GLFW/glfw3.h>
 
 /***************************************************************************************************
@@ -34,6 +35,11 @@ public:
 
 	static inline long getTimeMilliseconds() {
 		return (long) (glfwGetTime() * 1000);
+	}
+
+	/* This is for windows */
+	static inline void sleep(long milliseconds) {
+		Sleep(milliseconds);
 	}
 };
 

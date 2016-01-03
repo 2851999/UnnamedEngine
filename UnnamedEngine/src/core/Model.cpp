@@ -98,7 +98,6 @@ Model* Model::loadModel(const char* path, const char* fileName, std::string shad
 					if (currentMaterial->GetTextureCount(aiTextureType_HEIGHT) != 0) { //Some reason normal maps are stored here
 						aiString p;
 						currentMaterial->GetTexture(aiTextureType_HEIGHT, 0, &p, NULL, NULL, NULL, NULL, NULL);
-						std::cout << p.C_Str() << std::endl;
 						material->setNormalMap(Texture::loadTexture((to_string(path) + to_string(p.C_Str())).c_str()));
 					}
 					aiColor3D ambientColour = aiColor3D(1.0f, 1.0f, 1.0f);

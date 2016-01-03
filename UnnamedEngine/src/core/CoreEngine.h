@@ -37,10 +37,11 @@
 #include "../utils/MathUtils.h"
 #include "../utils/Logging.h"
 #include "../utils/FileUtils.h"
+#include "../utils/FPSUtils.h"
 #include "../utils/GLUtils.h"
 #include "../utils/Time.h"
 #include "../utils/Timer.h"
-#include "../utils/FPSCalculator.h"
+#include "BaseEngine.h"
 #include "render/Shader.h"
 #include "render/Renderer.h"
 #include "render/Scene.h"
@@ -53,7 +54,6 @@
 #include "game/DebugCamera.h"
 #include "Skybox.h"
 #include "Model.h"
-#include "Game.h"
 #include "Window.h"
 
 /***************************************************************************************************/

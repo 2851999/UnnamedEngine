@@ -19,9 +19,9 @@
 #ifndef CORE_RENDERER_H_
 #define CORE_RENDERER_H_
 
+#include "../BaseEngine.h"
 #include "../Mesh.h"
 #include "../Camera.h"
-#include "../Game.h"
 #include "Shader.h"
 #include "Material.h"
 #include "GeometryBuffer.h"

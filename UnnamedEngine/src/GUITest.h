@@ -30,13 +30,14 @@
 #include "core/gui/GUISlider.h"
 #include "core/gui/GUIWindow.h"
 #include "core/gui/GUITextDisplayArea.h"
+#include "core/gui/GUIPanel.h"
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/mesh.h>
 
-class GUITest : public Game {
+class GUITest : public BaseEngine {
 private:
 	Camera2D* camera;
 
@@ -48,7 +49,6 @@ private:
 	GUIRadioCheckBox* radio1;
 	GUIRadioCheckBox* radio2;
 	GUIRadioCheckBox* radio3;
-	GUILabel* label;
 	GUITextBox* textBox;
 	GUILoadingBar* loadingBar;
 	GUISlider* verticalSlider;
@@ -80,11 +80,14 @@ void GUITest::initialise(Settings* settings) {
 }
 
 void GUITest::created() {
+
 	//Renderer::initialise();
 	//camera = Camera2D(Matrix4f().setOrphographic(0, 1280, 720, 0, -1, 1));
 	camera = new Camera2D(Matrix4f().initOrthographic(0, getSettings()->getWindowWidth(), getSettings()->getWindowHeight(), 0, -1, 1));
 	camera->update();
 	Renderer::addCamera(camera);
+
+	GUIPanel* panel = new GUIPanel("MainPanel", true);
 
 	std::vector<Colour> colours;
 	colours.push_back(Colour::LIGHT_BLUE);
@@ -164,20 +167,22 @@ void GUITest::created() {
 
 	displayArea = new GUITextDisplayArea("Hello how are you today. This will hopefully work but I have no idea.", 200);
 	displayArea->setPosition(400, 400);
+
+	panel->add(checkBox);
+	panel->add(menu);
+	panel->add(list);
+	panel->add(radio);
+	panel->add(textBox);
+	panel->add(loadingBar);
+	panel->add(verticalSlider);
+	panel->add(horizontalSlider);
+	panel->add(window);
+	panel->add(displayArea);
+	panel->add(button);
 }
 
 void GUITest::update() {
-	button->update();
-	checkBox->update();
-	menu->update();
-	list->update();
-	radio->update();
-	textBox->update();
-	loadingBar->update();
-	verticalSlider->update();
-	horizontalSlider->update();
-	window->update();
-	displayArea->update();
+
 }
 
 void GUITest::render() {
@@ -185,23 +190,6 @@ void GUITest::render() {
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	//std::cout << textBox->selection->renderer->colours[0].toString() << std::endl;
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	button->render();
-	checkBox->render();
-	menu->render();
-	list->render();
-	radio->render();
-	textBox->render();
-	loadingBar->render();
-	verticalSlider->render();
-	horizontalSlider->render();
-	window->render();
-	displayArea->render();
-
-	renderInformation();
 }
 
 void GUITest::destroy() {
