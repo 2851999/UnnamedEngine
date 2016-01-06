@@ -32,9 +32,13 @@
 
 class Renderer {
 private:
+	/* The camera's */
 	static std::vector<Camera*> m_cameras;
+
+	/* The shaders */
 	static std::map<std::string, RenderShader*> m_shaders;
 
+	/* The currently bound textures */
 	static std::vector<Texture*> m_boundTextures;
 
 	static Shader* m_overrideShader;

@@ -16,16 +16,33 @@
  *
  *****************************************************************************/
 
-#include "Settings.h"
+#include "DebuggingGUI.h"
+
+#include "../render/Renderer.h"
 
 /***************************************************************************************************
- * The Settings class
+ * The DebuggingGUI class
  ***************************************************************************************************/
 
-const char* Settings::ENGINE_NAME =         "Unnamed Engine";
-const char* Settings::ENGINE_VERSION =      "V0.2.1";
-const char* Settings::ENGINE_VERSION_NAME = "New Language";
-const char* Settings::ENGINE_DATE =         "03/01/2016";
-const char* Settings::ENGINE_BUILD =        "Experimental";
+void DebuggingGUI::processCommand(std::string command) {
+	std::vector<std::string> split = split_string(command, ' ');
+
+	if (split[0] == "print") {
+		if (split[1] == "text") {
+			for (unsigned int n = 2; n < split.size(); n++) {
+				std::cout << split[n];
+				if (n != split.size() - 1)
+					std::cout << " ";
+			}
+			std::cout << std::endl;
+		} else if (split[1] == "version") {
+			std::cout << to_string(Settings::ENGINE_NAME) + " " + to_string(Settings::ENGINE_VERSION) + " (" + to_string(Settings::ENGINE_VERSION_NAME) + ") " + to_string(Settings::ENGINE_BUILD) + " " + to_string(Settings::ENGINE_DATE) << std::endl;
+		}
+	} else if (split[0] == "reload") {
+		if (split[1] == "shaders") {
+			Renderer::initialiseShaders();
+		}
+	}
+}
 
 /***************************************************************************************************/

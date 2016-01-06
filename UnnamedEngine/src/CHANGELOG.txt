@@ -1,4 +1,15 @@
 --------------------------------------------------------------
+Release 0 | Beta 0 | Development 0 | Experimental 11 (V0.2.1)
+
+* Added TextureEntity2D
+* Added Animation2D
+* Added TextureAnimation2D
+* Added Sprite2D
+* Added PhysicsObject
+* Added PhysicsObject2D
+* Added PhysicsObject3D
+
+--------------------------------------------------------------
 Release 0 | Beta 0 | Development 0 | Experimental 10 (V0.2.0)
 
 * Added RenderableObject

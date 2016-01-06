@@ -48,18 +48,7 @@ public:
 		InputListener::addListener();
 	}
 
-	void processCommand(std::string command) {
-		std::vector<std::string> split = split_string(command, ' ');
-
-		if (split[0] == "print") {
-			for (unsigned int n = 1; n < split.size(); n++) {
-				std::cout << split[n];
-				if (n != split.size() - 1)
-					std::cout << " ";
-			}
-			std::cout << std::endl;
-		}
-	}
+	void processCommand(std::string command);
 
 	void onKeyPressed(int code) override {}
 	void onKeyReleased(int code) override {}

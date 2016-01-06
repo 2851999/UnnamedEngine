@@ -28,13 +28,7 @@
 /***************************************************************************************************
  * The Object2D and 3D classes store data about 2D and 3D objects
  ***************************************************************************************************/
-class Object {
-public:
-	void update() {}
-	void render() {}
-};
-
-class Object2D : public Object {
+class Object2D {
 private:
 	Object2D* m_parent = NULL;
 public:
@@ -116,7 +110,7 @@ public:
 	inline void attach(Object2D* child) { child->setParent(this); }
 };
 
-class Object3D : public Object {
+class Object3D {
 private:
 	Object3D* m_parent = NULL;
 public:
